@@ -35,7 +35,7 @@ jobs:
 
 workflows:
   version: 2
-  publish:
+  build_and_publish:
     jobs:
       - build:
           filters:
