@@ -18,6 +18,6 @@
   ],
   "ci": {
     "organization": "journeyapps-platform",
-    "project": "runtime-components"
+    "project": "https-proxy-socket"
   }
 }
