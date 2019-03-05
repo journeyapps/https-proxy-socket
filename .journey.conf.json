@@ -1,0 +1,23 @@
+{
+  "environments": [
+    {
+      "name": "dev",
+      "scripts": {
+        "version": "npm version",
+        "publish": "npm publish --tag next"
+      }
+    },
+    {
+      "name": "prod",
+      "branch": "master",
+      "production": true,
+      "scripts": {
+        "publish": "npm publish"
+      }
+    }
+  ],
+  "ci": {
+    "organization": "journeyapps-platform",
+    "project": "runtime-components"
+  }
+}

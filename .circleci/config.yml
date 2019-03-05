@@ -1,0 +1,46 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10.15.1
+    steps:
+      - checkout
+      - run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+      - restore_cache:
+          keys:
+            - modules-{{ checksum "yarn.lock" }}
+      - run: yarn install --check-files --frozen-lockfile
+      - save_cache:
+          key: modules-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+      - run: yarn run build
+  publish:
+    docker:
+      - image: circleci/node:10.15.1
+    steps:
+      - checkout
+      - run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+      - restore_cache:
+          keys:
+            - modules-{{ checksum "yarn.lock" }}
+      - run: yarn install --check-files --frozen-lockfile
+      - save_cache:
+          key: modules-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+      - run: yarn run build
+      - run: ./node_modules/.bin/journey-deploy execute
+
+workflows:
+  version: 2
+  publish:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /.*/
+              ignore: /.*deploy-cli.*/
+            tags:
+              only: /.*/
+              ignore: /.*dev.*/
