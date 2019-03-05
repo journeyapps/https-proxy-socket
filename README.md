@@ -2,6 +2,9 @@
 
 Node library to enable opening Socket connections via an HTTPS proxy.
 
+Based on the implementation in https://github.com/TooTallNate/node-https-proxy-agent,
+but adapted to expose raw Sockets, instead of just http/https requests.
+
 ## Installation
 
     yarn add @journeyapps/https-proxy-socket

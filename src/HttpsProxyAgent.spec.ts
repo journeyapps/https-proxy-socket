@@ -1,6 +1,4 @@
-/**
- * Module dependencies.
- */
+// Based on tests in https://github.com/TooTallNate/node-https-proxy-agent
 
 import * as fs from 'fs';
 import * as http from 'http';
