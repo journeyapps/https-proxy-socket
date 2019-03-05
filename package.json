@@ -26,5 +26,10 @@
     "typescript": "3.2.4"
   },
   "main": "./lib/index.js",
-  "dependencies": {}
+  "dependencies": {},
+  "files": [
+    "/README.md",
+    "/src",
+    "/lib"
+  ]
 }
