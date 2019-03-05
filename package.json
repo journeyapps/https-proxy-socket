@@ -10,7 +10,7 @@
     "deploy": "journey-deploy trigger"
   },
   "devDependencies": {
-    "@journeyapps/deploy-cli": "^2.6.2",
+    "@journeyapps/deploy-cli": "2.6.2",
     "@journeyapps/formatter-cli": "^2.6.2",
     "@types/agent-base": "^4.2.0",
     "@types/mocha": "^5.2.6",

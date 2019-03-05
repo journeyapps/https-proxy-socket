@@ -2,14 +2,14 @@
 # yarn lockfile v1
 
 
-"@journeyapps/ci-tools@^2.8.2":
+"@journeyapps/ci-tools@^2.6.2":
   version "2.8.2"
   resolved "https://registry.yarnpkg.com/@journeyapps/ci-tools/-/ci-tools-2.8.2.tgz#cd7683f03b9ff298814cf16f901eba0d87bcf3b3"
   integrity sha512-0KiHrZ7Cec7PYTzZEk20NQkw4WOhPspB/J3sflj7BpPWpBV4JKLsHR0yhd2MvJQArVDaTjktfUlziiyMKx+kxA==
   dependencies:
     node-fetch "^2.3.0"
 
-"@journeyapps/cli-core@^2.8.2":
+"@journeyapps/cli-core@^2.6.2", "@journeyapps/cli-core@^2.8.2":
   version "2.8.2"
   resolved "https://registry.yarnpkg.com/@journeyapps/cli-core/-/cli-core-2.8.2.tgz#3bdc6ac448f45c9496eeca6942cd1cfead27e4d0"
   integrity sha512-8noM6YMzwwTY6uJ/jXlpgFOE8X5kjkQflDAE9z+qqqKIMUkihVFrhpRtPsQx7o1ECZSPVP+Z3PcjmHo0bnSJ+w==
@@ -23,49 +23,37 @@
     minimist "^1.2.0"
     node-fetch "^2.2.0"
 
-"@journeyapps/cli-interaction@^2.8.2":
+"@journeyapps/cli-interaction@^2.6.2", "@journeyapps/cli-interaction@^2.8.2":
   version "2.8.2"
   resolved "https://registry.yarnpkg.com/@journeyapps/cli-interaction/-/cli-interaction-2.8.2.tgz#24e1d33e0d2a1755b33f487a72c7e91da2e5b5b5"
   integrity sha512-EvTLAsFbqPY9jE7PHJzJFZAwZg2LXw7EgACy7TryU6lZ2qC/b9rwG7Xnmd6/c1BMMHkkibGsXZdFZORA87YGJw==
   dependencies:
     inquirer "^6.2.1"
 
-"@journeyapps/cli-logger@^2.8.2":
+"@journeyapps/cli-logger@^2.6.2", "@journeyapps/cli-logger@^2.8.2":
   version "2.8.2"
   resolved "https://registry.yarnpkg.com/@journeyapps/cli-logger/-/cli-logger-2.8.2.tgz#839ddbf7a2bc8007d059d854810a7cf9aa2ecb4e"
   integrity sha512-xf3J5BIzWjDNun6D53HCHpDmr+ifl8lmcmcKfGQrn2tnXUvqrayHQ1on/3FP5fQh7NSmOTPtYWO5mdjIOENF3w==
   dependencies:
     chalk "^2.4.1"
 
-"@journeyapps/deploy-cli-core@^2.8.2":
-  version "2.8.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/deploy-cli-core/-/deploy-cli-core-2.8.2.tgz#31d9f178b37503a45cc422ea45a5559f4ed88e81"
-  integrity sha512-SAP6UGEptN3s4srjxUkfv4Nq3om8+XEH4Wwtlu5Vix45mOvgslRmigsscOpGkYpdiqqzVPXPK+Snke8XBDr3ug==
+"@journeyapps/deploy-cli@2.6.2":
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@journeyapps/deploy-cli/-/deploy-cli-2.6.2.tgz#ff8f0e377f45cbc8509f5ded61ad0595688e1009"
+  integrity sha512-uP2/qhr2fUjFCzNp328mg6hCCAW2VcVNsPI7fP1ZTTkSdMMfeBsL6IJxAFVzGBdCXfeW3dTpoBhbkX1bM0cICw==
   dependencies:
-    "@journeyapps/ci-tools" "^2.8.2"
-    "@journeyapps/cli-core" "^2.8.2"
-    "@journeyapps/cli-interaction" "^2.8.2"
-    "@journeyapps/cli-logger" "^2.8.2"
-    "@journeyapps/filesystem" "^2.8.2"
+    "@journeyapps/ci-tools" "^2.6.2"
+    "@journeyapps/cli-core" "^2.6.2"
+    "@journeyapps/cli-interaction" "^2.6.2"
+    "@journeyapps/cli-logger" "^2.6.2"
+    "@journeyapps/filesystem" "^2.6.2"
     fs-extra "^7.0.0"
     immer "^1.7.2"
     semver "^5.6.0"
     treeify "^1.1.0"
     uuid "^3.3.2"
 
-"@journeyapps/deploy-cli@^2.6.2":
-  version "2.8.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/deploy-cli/-/deploy-cli-2.8.2.tgz#7ea87e5b7feb8a103fa7c0915be40d4e65105a19"
-  integrity sha512-i7ZaLWSHi0/VFIBMBx1T0CFAwafVKv+c6MrFGEB1+8Ee8Ese41ubcy0TMaQPi1z47nA3rZImJLF3d2pEwNDSXQ==
-  dependencies:
-    "@journeyapps/cli-core" "^2.8.2"
-    "@journeyapps/cli-interaction" "^2.8.2"
-    "@journeyapps/cli-logger" "^2.8.2"
-    "@journeyapps/deploy-cli-core" "^2.8.2"
-    "@journeyapps/npm-deploy-executor" "^2.8.2"
-    treeify "^1.1.0"
-
-"@journeyapps/filesystem@^2.8.2":
+"@journeyapps/filesystem@^2.6.2":
   version "2.8.2"
   resolved "https://registry.yarnpkg.com/@journeyapps/filesystem/-/filesystem-2.8.2.tgz#5f0de3ecba95dcd8833745289a14a39b31d00186"
   integrity sha512-L8ZZp+J03/zU1SgZjsQZ4emJYmNtpVnsq9T3v/q8nvnvBCrR+2X5iQD7Wy1xTyq4z2jjLLG1uiHi4Vy/cBCkRw==
@@ -82,15 +70,6 @@
     "@journeyapps/cli-core" "^2.8.2"
     "@journeyapps/cli-logger" "^2.8.2"
     prettier "^1.14.3"
-
-"@journeyapps/npm-deploy-executor@^2.8.2":
-  version "2.8.2"
-  resolved "https://registry.yarnpkg.com/@journeyapps/npm-deploy-executor/-/npm-deploy-executor-2.8.2.tgz#d8a5ad57170fc589f7349e15e7e60ee01d5db41d"
-  integrity sha512-we35RZgqJYyEE3IWiWjqkzgq1ugJ8NsmEah2bu19een9Zx+c11kPyJtfI3WvdVEowj+wWWul/ncRWj3m/TGdKw==
-  dependencies:
-    "@journeyapps/cli-core" "^2.8.2"
-    "@journeyapps/cli-logger" "^2.8.2"
-    "@journeyapps/deploy-cli-core" "^2.8.2"
 
 "@types/agent-base@^4.2.0":
   version "4.2.0"
