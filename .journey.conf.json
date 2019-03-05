@@ -4,7 +4,7 @@
       "name": "dev",
       "scripts": {
         "version": "npm version",
-        "publish": "npm publish --tag next"
+        "publish": "npm publish --access restricted --tag next"
       }
     },
     {
