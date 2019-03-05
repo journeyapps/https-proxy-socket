@@ -1,5 +1,6 @@
 {
   "name": "@journeyapps/https-proxy-socket",
+  "version": "0.0.1",
   "private": true,
   "author": "JourneyApps",
   "scripts": {
