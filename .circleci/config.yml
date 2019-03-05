@@ -15,6 +15,7 @@ jobs:
           paths:
             - node_modules
       - run: yarn run build
+      - run: yarn run test
   publish:
     docker:
       - image: circleci/node:10.15.1

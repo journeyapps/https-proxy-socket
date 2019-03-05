@@ -7,17 +7,21 @@ import * as tls from 'tls';
  *
  * @param proxy
  */
-export function agent(proxy: HttpsProxySocket) {
+export function agent(proxy: HttpsProxySocket, options?: tls.ConnectionOptions) {
   return agentBase(async (req, opts: any) => {
     const socket = await proxy.connect(opts);
 
     if (opts.secureEndpoint) {
       // Upgrade to TLS
-      let tlsOptions = {
+      let tlsOptions: tls.ConnectionOptions = {
         socket: socket,
-        servername: opts.servername || opts.host,
-        rejectUnauthorized: opts.rejectUnauthorized
+        servername: opts.servername || opts.host
       };
+      if (typeof opts.rejectUnauthorized != 'undefined') {
+        // There's a difference between 'undefined' (equivalent of false) and "not set" (equivalent of true)
+        tlsOptions.rejectUnauthorized = opts.rejectUnauthorized;
+      }
+      Object.assign(tlsOptions, options);
       const tlsSocket = tls.connect(tlsOptions);
       return tlsSocket;
     } else {

@@ -13,10 +13,16 @@ import { agent as proxyAgent } from './HttpsProxyAgent';
 import { ConnectionOptions } from 'tls';
 import { AddressInfo } from 'net';
 
+import fetch from 'node-fetch';
+
 const Proxy = require('proxy');
 
-function makeProxy(url: string | ConnectionOptions, opts?: HttpsProxyConfig): http.Agent {
-  return (proxyAgent(new HttpsProxySocket(url, opts)) as any) as http.Agent;
+function makeProxy(
+  url: string | ConnectionOptions,
+  opts?: HttpsProxyConfig,
+  agentOptions?: ConnectionOptions
+): http.Agent {
+  return (proxyAgent(new HttpsProxySocket(url, opts), agentOptions) as any) as http.Agent;
 }
 
 describe('HttpsProxyAgent', function() {
@@ -105,7 +111,7 @@ describe('HttpsProxyAgent', function() {
       delete sslProxy.authenticate;
     });
 
-    it('should work over an HTTPS proxy', function(done) {
+    it('should work over an HTTPS proxy', async function() {
       server.once('request', function(req, res) {
         res.end(JSON.stringify(req.headers));
       });
@@ -116,25 +122,13 @@ describe('HttpsProxyAgent', function() {
         rejectUnauthorized: false
       };
       var agent = makeProxy(proxy);
-      const opts = {
-        ...url.parse('http://127.0.0.1:' + serverPort),
-        agent
-      };
 
-      http.get(opts, function(res) {
-        var data = '';
-        res.setEncoding('utf8');
-        res.on('data', function(b) {
-          data += b;
-        });
-        res.on('end', function() {
-          const parsed = JSON.parse(data);
-          assert.equal('127.0.0.1:' + serverPort, parsed.host);
-          done();
-        });
-      });
+      const response = await fetch('http://127.0.0.1:' + serverPort, { agent });
+      assert.equal(200, response.status);
+      assert.equal('127.0.0.1:' + serverPort, (await response.json()).host);
     });
-    it('should receive the 407 authorization code on the `http.ClientResponse`', function(done) {
+
+    it('should receive the 407 authorization code on the `http.ClientResponse`', async function() {
       // set a proxy authentication function for this test
       sslProxy.authenticate = function(req: any, fn: any) {
         // reject all requests
@@ -147,41 +141,50 @@ describe('HttpsProxyAgent', function() {
         rejectUnauthorized: false
       });
 
-      // `host` and `port` don't really matter since the proxy will reject anyways
-      var opts = {
-        host: '127.0.0.1',
-        port: 80,
-        agent: agent
-      };
-
-      var req = http.get(opts);
-      req.once('error', function(err: any) {
-        assert.equal('Proxy connection failed: HTTP/1.1 407 Proxy Authentication Required', err.message);
-        req.abort();
-        done();
-      });
+      try {
+        await fetch('http://127.0.0.1:' + serverPort, { agent });
+        assert.fail('Error expected');
+      } catch (err) {
+        assert.equal(true, /407 Proxy Authentication Required/.test(err.message));
+      }
     });
-    it('should emit an "error" event on the `http.ClientRequest` if the proxy does not exist', function(done) {
+
+    it('should emit an "error" event on the `http.ClientRequest` if the proxy does not exist', async function() {
       // port 4 is a reserved, but "unassigned" port
       var proxyUri = 'http://127.0.0.1:4';
       var agent = makeProxy(proxyUri);
 
-      const opts = {
-        ...url.parse('http://nodejs.org'),
-        agent
-      };
-
-      var req = http.get(opts);
-      req.once('error', function(err: any) {
+      try {
+        await fetch('http://127.0.0.1:' + serverPort, { agent });
+        assert.fail('Error expected');
+      } catch (err) {
         assert.equal('ECONNREFUSED', err.code);
-        req.abort();
-        done();
-      });
+      }
     });
   });
 
   describe('"https" module', function() {
-    it('should work over an HTTPS proxy', function(done) {
+    it('should work over an HTTPS proxy', async function() {
+      sslServer.on('request', function(req, res) {
+        res.end(JSON.stringify(req.headers));
+      });
+
+      var agent = makeProxy(
+        {
+          host: '127.0.0.1',
+          port: sslProxyPort,
+          rejectUnauthorized: false
+        },
+        null,
+        { rejectUnauthorized: false }
+      );
+
+      const response = await fetch('https://127.0.0.1:' + sslServerPort, { agent });
+      assert.equal(200, response.status);
+      assert.equal('127.0.0.1:' + sslServerPort, (await response.json()).host);
+    });
+
+    it('should reject self-signed cert by default', async function() {
       sslServer.on('request', function(req, res) {
         res.end(JSON.stringify(req.headers));
       });
@@ -192,24 +195,12 @@ describe('HttpsProxyAgent', function() {
         rejectUnauthorized: false
       });
 
-      const opts = {
-        ...url.parse('https://127.0.0.1:' + sslServerPort),
-        agent,
-        rejectUnauthorized: false
-      };
-
-      https.get(opts, function(res) {
-        var data = '';
-        res.setEncoding('utf8');
-        res.on('data', function(b) {
-          data += b;
-        });
-        res.on('end', function() {
-          const parsed = JSON.parse(data);
-          assert.equal('127.0.0.1:' + sslServerPort, parsed.host);
-          done();
-        });
-      });
+      try {
+        await fetch('https://127.0.0.1:' + sslServerPort, { agent });
+        assert.fail('Error expected');
+      } catch (err) {
+        assert.equal('DEPTH_ZERO_SELF_SIGNED_CERT', err.code);
+      }
     });
   });
 });
