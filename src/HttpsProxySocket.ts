@@ -84,8 +84,11 @@ export class HttpsProxySocket {
 
     function read() {
       var b = socket.read();
-      if (b) ondata(b);
-      else socket.once('readable', read);
+      if (b) {
+        ondata(b);
+      } else {
+        socket.once('readable', read);
+      }
     }
 
     function cleanup() {
