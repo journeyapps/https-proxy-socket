@@ -1,0 +1,34 @@
+{
+  "name": "@journeyapps/https-proxy-socket",
+  "version": "0.0.1",
+  "author": "JourneyApps",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha src/*.spec.ts",
+    "format": "journey-formatter format",
+    "deploy": "journey-deploy trigger"
+  },
+  "devDependencies": {
+    "@journeyapps/deploy-cli": "2.6.2",
+    "@journeyapps/formatter-cli": "^2.6.2",
+    "@types/agent-base": "^4.2.0",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.9.4",
+    "@types/node-fetch": "^2.1.6",
+    "agent-base": "^4.2.1",
+    "assert": "^1.4.1",
+    "mocha": "^6.0.2",
+    "mssql": "^4.3.2",
+    "node-fetch": "^2.3.0",
+    "proxy": "^0.2.4",
+    "ts-node": "^8.0.2",
+    "typescript": "3.2.4"
+  },
+  "main": "./lib/index.js",
+  "dependencies": {},
+  "files": [
+    "/README.md",
+    "/src",
+    "/lib"
+  ]
+}
