@@ -16,16 +16,21 @@ export interface ConnectionOptions {
 }
 
 /**
- * The `HttpsProxyAgent` implements an HTTP Agent subclass that connects to the
- * specified "HTTP(s) proxy server" in order to proxy HTTPS requests.
- *
- * @api public
+ * The HttpsProxySocket class allows creating Socket connections via an HTTPS proxy.
+ * HTTP proxies are not supported.
+ * For http(s) requests, use HttpsProxyAgent as a wrapper around this.
  */
-
 export class HttpsProxySocket {
   proxy: tls.ConnectionOptions;
   proxyConfig: HttpsProxyConfig;
 
+  /**
+   *
+   * @param opts - The connection options to the proxy. At least host and port are required.
+   *               Use {rejectUnauthorized: true} to ignore certificates for the proxy (not the endpoint).
+   * @param proxyConfig - { auth: 'username:password' } for basic auth.
+   *                      { headers: {key: 'value'} } for custom headers.
+   */
   constructor(opts: tls.ConnectionOptions | string, proxyConfig?: HttpsProxyConfig) {
     let sanitizedOptions;
     if (typeof opts == 'string') {
@@ -50,7 +55,7 @@ export class HttpsProxySocket {
   /**
    * Create a new Socket connection.
    *
-   * @param opts - hostname and port
+   * @param opts - host and port
    */
   connect(opts: ConnectionOptions): Promise<tls.TLSSocket> {
     return new Promise<tls.TLSSocket>((resolve, reject) => {

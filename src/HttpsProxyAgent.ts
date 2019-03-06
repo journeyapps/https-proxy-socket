@@ -5,7 +5,8 @@ import * as tls from 'tls';
 /**
  * Construct an agent for http(s) requests. Mostly for testing purposes.
  *
- * @param proxy
+ * @param proxy - the proxy to use
+ * @param options - to set additional TLS options for https requests, e.g. rejectUnauthorized
  */
 export function agent(proxy: HttpsProxySocket, options?: tls.ConnectionOptions) {
   return agentBase(async (req, opts: any) => {
