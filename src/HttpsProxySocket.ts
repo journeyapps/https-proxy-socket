@@ -44,13 +44,6 @@ export class HttpsProxySocket {
     debug('creating new HttpsProxyAgent instance: %o', sanitizedOptions);
 
     this.proxyConfig = proxyConfig || {};
-
-    // ALPN is supported by Node.js >= v5.
-    // attempt to negotiate http/1.1 for proxy servers that support http/2
-    if (!('ALPNProtocols' in sanitizedOptions)) {
-      sanitizedOptions.ALPNProtocols = ['http 1.1'];
-    }
-
     this.proxy = sanitizedOptions;
   }
 
