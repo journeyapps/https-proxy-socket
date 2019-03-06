@@ -111,13 +111,18 @@ export class HttpsProxySocket {
       cb(err, null);
     }
 
+    const END_OF_HEADERS = '\r\n\r\n';
+
     function ondata(b: Buffer) {
       buffers.push(b);
       buffersLength += b.length;
-      var buffered = Buffer.concat(buffers, buffersLength);
-      var str = buffered.toString('ascii');
 
-      if (!~str.indexOf('\r\n\r\n')) {
+      // Headers (including URLs) are generally ISO-8859-1 or ASCII.
+      // The subset used by an HTTPS proxy should always be safe as ASCII.
+      const buffered = Buffer.concat(buffers, buffersLength);
+      const str = buffered.toString('ascii');
+
+      if (str.indexOf(END_OF_HEADERS) < 0) {
         // keep buffering
         debug('have not received end of HTTP headers yet...');
         if (socket.read) {
@@ -128,16 +133,16 @@ export class HttpsProxySocket {
         return;
       }
 
-      var firstLine = str.substring(0, str.indexOf('\r\n'));
-      var statusCode = +firstLine.split(' ')[1];
+      const firstLine = str.substring(0, str.indexOf('\r\n'));
+      const statusCode = parseInt(firstLine.split(' ')[1], 10);
       debug('got proxy server response: %o', firstLine);
 
       if (200 == statusCode) {
         // 200 Connected status code!
-        var sock = socket;
+        const sock = socket;
 
         // nullify the buffered data since we won't be needing it
-        buffers = buffered = null;
+        buffers = null;
 
         cleanup();
         cb(null, sock);
@@ -148,7 +153,7 @@ export class HttpsProxySocket {
         cleanup();
 
         // nullify the buffered data since we won't be needing it
-        buffers = buffered = null;
+        buffers = null;
 
         cleanup();
         socket.end();

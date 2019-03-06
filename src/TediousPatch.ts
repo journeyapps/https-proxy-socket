@@ -12,13 +12,11 @@ export function useProxy(proxy: HttpsProxySocket) {
   const { Connector } = require('tedious/lib/connector');
   Connector.prototype.execute = async function(cb: any) {
     debug(`opening sql connection to ${this.options.host}:${this.options.port}`);
-    proxy.connect(this.options).then(
-      socket => {
-        cb(null, socket);
-      },
-      error => {
-        cb(error);
-      }
-    );
+    try {
+      const socket = await proxy.connect(this.options);
+      cb(null, socket);
+    } catch (error) {
+      cb(error);
+    }
   };
 }
