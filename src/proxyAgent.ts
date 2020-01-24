@@ -9,7 +9,7 @@ import * as tls from 'tls';
  * @param options - to set additional TLS options for https requests, e.g. rejectUnauthorized
  */
 export function proxyAgent(proxy: HttpsProxySocket, options?: tls.ConnectionOptions) {
-  return agentBase(async (req, opts: any) => {
+  return agentBase(async (req: agentBase.ClientRequest, opts: any) => {
     const socket = await proxy.connect(opts);
 
     if (opts.secureEndpoint) {

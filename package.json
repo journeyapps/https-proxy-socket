@@ -1,6 +1,6 @@
 {
   "name": "@journeyapps/https-proxy-socket",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "JourneyApps",
   "repository": "journeyapps/https-proxy-socket",
   "license": "MIT",
@@ -17,14 +17,14 @@
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.9.4",
     "@types/node-fetch": "^2.1.6",
-    "agent-base": "^4.2.1",
+    "agent-base": "^6.0.0",
     "assert": "^1.4.1",
     "mocha": "^6.0.2",
     "mssql": "^4.3.2",
     "node-fetch": "^2.3.0",
     "proxy": "^1.0.1",
     "ts-node": "^8.0.2",
-    "typescript": "3.2.4"
+    "typescript": "^3.7.5"
   },
   "main": "./lib/index.js",
   "dependencies": {},
