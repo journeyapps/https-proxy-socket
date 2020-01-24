@@ -2,6 +2,7 @@
   "name": "@journeyapps/https-proxy-socket",
   "version": "0.0.1",
   "author": "JourneyApps",
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "test": "mocha src/*.spec.ts",
@@ -28,7 +29,6 @@
   "dependencies": {},
   "files": [
     "/README.md",
-    "/src",
     "/lib"
   ]
 }
