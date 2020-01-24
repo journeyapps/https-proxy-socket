@@ -16,13 +16,18 @@ but adapted to expose raw Sockets, instead of just http/https requests.
 
     // Proxy connection options
     const proxy = new HttpsProxySocket('https://my-proxy.test', {
-      // Additional options for the proxy may be set here, for example:
+      // Proxy auth and headers may be set here, for example:
       auth: 'myuser:mypassword' // Basic auth
     });
 
     const agent = proxy.agent({
       // Additional TLS options for the host may be set here, for example:
-      // rejectUnauthorized: false
+      // rejectUnauthorized: false, // Disable TLS checks completely (dangerous)
+      // ca: fs.readFileSync('my-ca-cert.pem') // Use a custom CA cert
+
+      // Documentation of the available options is available here:
+      //  https://nodejs.org/api/tls.html#tls_new_tls_tlssocket_socket_options
+      //  https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
     });
 
     const response = await fetch('https://myhost.test', { agent: agent });
@@ -30,9 +35,7 @@ but adapted to expose raw Sockets, instead of just http/https requests.
 ## Usage - Direct socket
 
     const { HttpsProxySocket } = require('@journeyapps/https-proxy-socket');
-    const proxy = new HttpsProxySocket('https://my-proxy.test', {
-        auth: 'myuser:mypassword' // Optional: proxy basic auth
-    });
+    const proxy = new HttpsProxySocket('https://my-proxy.test');
 
     const socket = await proxy.connect({host: 'myhost.test', port: 1234});
 
