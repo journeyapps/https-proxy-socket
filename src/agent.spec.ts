@@ -4,10 +4,9 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
 import * as assert from 'assert';
-import * as url from 'url';
 
 import { HttpsProxySocket, HttpsProxyConfig } from './HttpsProxySocket';
-import { agent as proxyAgent } from './HttpsProxyAgent';
+import { agent as proxyAgent } from './agent';
 import { ConnectionOptions } from 'tls';
 import { AddressInfo } from 'net';
 
@@ -70,24 +69,15 @@ describe('HttpsProxyAgent', function() {
 
   // shut down test HTTP server
   after(function(done) {
-    server.once('close', function() {
-      done();
-    });
-    server.close();
+    server.close(done);
   });
 
   after(function(done) {
-    sslServer.once('close', function() {
-      done();
-    });
-    sslServer.close();
+    sslServer.close(done);
   });
 
   after(function(done) {
-    sslProxy.once('close', function() {
-      done();
-    });
-    sslProxy.close();
+    sslProxy.close(done);
   });
 
   describe('constructor', function() {

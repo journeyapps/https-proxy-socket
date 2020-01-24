@@ -26,6 +26,7 @@ export function agent(proxy: HttpsProxySocket, options?: tls.ConnectionOptions) 
       const tlsSocket = tls.connect(tlsOptions);
       return tlsSocket;
     } else {
+      socket.resume();
       return socket;
     }
   });
