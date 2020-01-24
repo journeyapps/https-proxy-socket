@@ -9,33 +9,44 @@ but adapted to expose raw Sockets, instead of just http/https requests.
 
     yarn add @journeyapps/https-proxy-socket
 
-## Usage
-
+## Usage - node-fetch
 
     const { HttpsProxySocket } = require('@journeyapps/https-proxy-socket');
-    const proxy = new HttpsProxySocket({
-      // Connection options
-      host: 'my-proxy.test',
-      port: 443
-    }, {
+    const fetch = require('node-fetch');
+
+    // Proxy connection options
+    const proxy = new HttpsProxySocket('https://my-proxy.test', {
+      // Additional options for the proxy may be set here, for example:
+      auth: 'myuser:mypassword' // Basic auth
+    });
+
+    const agent = proxy.agent({
+      // Additional TLS options for the host may be set here, for example:
+      // rejectUnauthorized: false
+    });
+
+    const response = await fetch('https://myhost.test', { agent: agent });
+
+## Usage - Direct socket
+
+    const { HttpsProxySocket } = require('@journeyapps/https-proxy-socket');
+    const proxy = new HttpsProxySocket('https://my-proxy.test', {
         auth: 'myuser:mypassword' // Optional: proxy basic auth
     });
 
     const socket = await proxy.connect({host: 'myhost.test', port: 1234});
 
-## Usage with mssql
-
+## Usage - mssql
 
     const sql = require('mssql')
-    const { useProxy } = require('@journeyapps/https-proxy-socket/lib/TediousPatch');
+    const { HttpsProxySocket, useProxyForTedious } = require('@journeyapps/https-proxy-socket');
 
-    const { HttpsProxySocket } = require('./lib/HttpsProxySocket');
     const proxy = new HttpsProxySocket({
       // Same as above
     });
 
     // Register the proxy globally for tedious/mssql
-    useProxy(proxy);
+    useProxyForTedious(proxy);
 
     async function run() {
       // Connect using the proxy

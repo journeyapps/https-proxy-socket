@@ -6,7 +6,7 @@ import * as https from 'https';
 import * as assert from 'assert';
 
 import { HttpsProxySocket, HttpsProxyConfig } from './HttpsProxySocket';
-import { agent as proxyAgent } from './agent';
+import { proxyAgent } from './proxyAgent';
 import { ConnectionOptions } from 'tls';
 import { AddressInfo } from 'net';
 
