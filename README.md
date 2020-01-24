@@ -9,33 +9,47 @@ but adapted to expose raw Sockets, instead of just http/https requests.
 
     yarn add @journeyapps/https-proxy-socket
 
-## Usage
-
+## Usage - node-fetch
 
     const { HttpsProxySocket } = require('@journeyapps/https-proxy-socket');
-    const proxy = new HttpsProxySocket({
-      // Connection options
-      host: 'my-proxy.test',
-      port: 443
-    }, {
-        auth: 'myuser:mypassword' // Optional: proxy basic auth
+    const fetch = require('node-fetch');
+
+    // Proxy connection options
+    const proxy = new HttpsProxySocket('https://my-proxy.test', {
+      // Proxy auth and headers may be set here, for example:
+      auth: 'myuser:mypassword' // Basic auth
     });
+
+    const agent = proxy.agent({
+      // Additional TLS options for the host may be set here, for example:
+      // rejectUnauthorized: false, // Disable TLS checks completely (dangerous)
+      // ca: fs.readFileSync('my-ca-cert.pem') // Use a custom CA cert
+
+      // Documentation of the available options is available here:
+      //  https://nodejs.org/api/tls.html#tls_new_tls_tlssocket_socket_options
+      //  https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
+    });
+
+    const response = await fetch('https://myhost.test', { agent: agent });
+
+## Usage - Direct socket
+
+    const { HttpsProxySocket } = require('@journeyapps/https-proxy-socket');
+    const proxy = new HttpsProxySocket('https://my-proxy.test');
 
     const socket = await proxy.connect({host: 'myhost.test', port: 1234});
 
-## Usage with mssql
-
+## Usage - mssql
 
     const sql = require('mssql')
-    const { useProxy } = require('@journeyapps/https-proxy-socket/lib/TediousPatch');
+    const { HttpsProxySocket, useProxyForTedious } = require('@journeyapps/https-proxy-socket');
 
-    const { HttpsProxySocket } = require('./lib/HttpsProxySocket');
     const proxy = new HttpsProxySocket({
       // Same as above
     });
 
     // Register the proxy globally for tedious/mssql
-    useProxy(proxy);
+    useProxyForTedious(proxy);
 
     async function run() {
       // Connect using the proxy

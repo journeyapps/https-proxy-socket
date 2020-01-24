@@ -1,7 +1,9 @@
 {
   "name": "@journeyapps/https-proxy-socket",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "author": "JourneyApps",
+  "repository": "journeyapps/https-proxy-socket",
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "test": "mocha src/*.spec.ts",
@@ -20,7 +22,7 @@
     "mocha": "^6.0.2",
     "mssql": "^4.3.2",
     "node-fetch": "^2.3.0",
-    "proxy": "^0.2.4",
+    "proxy": "^1.0.1",
     "ts-node": "^8.0.2",
     "typescript": "3.2.4"
   },
@@ -28,7 +30,6 @@
   "dependencies": {},
   "files": [
     "/README.md",
-    "/src",
     "/lib"
   ]
 }

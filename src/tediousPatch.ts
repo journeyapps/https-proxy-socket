@@ -8,7 +8,7 @@ const debug = require('debug')('https-proxy');
  *
  * @param proxy - the proxy to use
  */
-export function useProxy(proxy: HttpsProxySocket) {
+export function useProxyForTedious(proxy: HttpsProxySocket) {
   const { Connector } = require('tedious/lib/connector');
   Connector.prototype.execute = async function(cb: any) {
     debug(`opening sql connection to ${this.options.host}:${this.options.port}`);

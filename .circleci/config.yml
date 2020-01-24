@@ -1,47 +1,49 @@
 version: 2
 jobs:
-  build:
+  build_8:
     docker:
-      - image: circleci/node:8.11.4
+      - image: circleci/node:8.17.0
     steps:
       - checkout
       - run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-      - restore_cache:
-          keys:
-            - modules-{{ checksum "yarn.lock" }}
-      - run: yarn install --check-files --frozen-lockfile
-      - save_cache:
-          key: modules-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules
+      - run: yarn install --frozen-lockfile || yarn install --frozen-lockfile || yarn install --frozen-lockfile
       - run: yarn run build
       - run: yarn run test
-  publish:
+
+  build_10:
     docker:
-      - image: circleci/node:8.11.4
+      - image: circleci/node:10.18.1
     steps:
       - checkout
       - run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-      - restore_cache:
-          keys:
-            - modules-{{ checksum "yarn.lock" }}
-      - run: yarn install --check-files --frozen-lockfile
-      - save_cache:
-          key: modules-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules
+      - run: yarn install --frozen-lockfile || yarn install --frozen-lockfile || yarn install --frozen-lockfile
+      - run: yarn run build
+      - run: yarn run test
+
+  build_12:
+    docker:
+      - image: circleci/node:12.14.1
+    steps:
+      - checkout
+      - run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+      - run: yarn install --frozen-lockfile || yarn install --frozen-lockfile || yarn install --frozen-lockfile
+      - run: yarn run build
+      - run: yarn run test
+
+  publish:
+    docker:
+      - image: circleci/node:12.14.1
+    steps:
+      - checkout
+      - run: echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+      - run: yarn install --frozen-lockfile || yarn install --frozen-lockfile || yarn install --frozen-lockfile
       - run: yarn run build
       - run: ./node_modules/.bin/journey-deploy execute
 
 workflows:
   version: 2
-  build_and_publish:
+  build:
     jobs:
-      - build:
-          filters:
-            branches:
-              only: /.*/
-              ignore: /.*deploy-cli.*/
-            tags:
-              only: /.*/
-              ignore: /.*dev.*/
+      - build_8
+      - build_10
+      - build_12

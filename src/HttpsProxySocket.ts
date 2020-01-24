@@ -2,6 +2,7 @@
 
 import * as tls from 'tls';
 import * as url from 'url';
+import { proxyAgent } from './proxyAgent';
 
 const debug = require('debug')('https-proxy');
 
@@ -67,6 +68,15 @@ export class HttpsProxySocket {
         }
       });
     });
+  }
+
+  /**
+   * Construct an agent for http(s) requests.
+   *
+   * @param options - to set additional TLS options for https requests, e.g. rejectUnauthorized
+   */
+  agent(options?: tls.ConnectionOptions) {
+    return proxyAgent(this, options);
   }
 
   private _connect(opts: ConnectionOptions, cb: (error: any, socket: tls.TLSSocket) => void) {
