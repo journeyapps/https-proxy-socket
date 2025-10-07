@@ -27,7 +27,8 @@
   },
   "main": "./lib/index.js",
   "dependencies": {
-    "agent-base": "^6.0.0"
+    "agent-base": "^6.0.0",
+    "socks": "^2.8.7"
   },
   "files": [
     "/README.md",

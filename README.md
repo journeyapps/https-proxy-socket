@@ -63,3 +63,37 @@ but adapted to expose raw Sockets, instead of just http/https requests.
     }
 
     run().catch(console.error);
+
+
+## Usage - MongoDB
+
+    import * as mongo from 'mongodb';
+    import { useProxyForMongo } from '@journeyapps/https-proxy-socket';
+
+    const SRV_URI = 'mongodb+srv://<username>:<password>@cluster0.jzuewet.mongodb.net';
+    const PROXY = 'us-cc-proxy.journeyapps.com'; // Or za-cc-proxy.journeyapps.com
+    const PROXY_PORT = 443
+
+    // Register the proxy globally for MongoDB
+    useProxyForMongo({
+      proxy: PROXY,
+      auth: <egress_token>
+    });
+
+    async function run() {
+      const client = new mongo.MongoClient(SRV_URI, {
+        proxyPort: PROXY_PORT,
+        proxyHost: PROXY,
+      });
+      try {
+        const database = client.db('poc');
+        const data = database.collection('data');
+
+        const results = await data.find({ index: { $lt: 5 } }).toArray();
+        console.log(results);
+      } finally {
+      await client.close();
+      }
+    }
+
+    run().catch(console.error);
