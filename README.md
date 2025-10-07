@@ -66,6 +66,8 @@ but adapted to expose raw Sockets, instead of just http/https requests.
 
 
 ## Usage - MongoDB
+The socks package needs to be added to your package.json dependencies for this to work.
+See the MongoDB documentation for details: https://www.mongodb.com/docs/drivers/node/current/security/socks/
 
     import * as mongo from 'mongodb';
     import { useProxyForMongo } from '@journeyapps/https-proxy-socket';
