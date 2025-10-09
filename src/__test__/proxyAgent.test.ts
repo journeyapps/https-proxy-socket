@@ -1,9 +1,8 @@
 import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
-import * as assert from 'assert';
 import { createProxy } from 'proxy';
-import { describe, afterEach, it, beforeEach } from 'vitest';
+import { describe, afterEach, it, beforeEach, expect } from 'vitest';
 
 import { HttpsProxySocket, HttpsProxyConfig } from '../HttpsProxySocket';
 import { proxyAgent } from '../proxyAgent';
@@ -36,7 +35,7 @@ describe('HttpsProxyAgent', function () {
 
     // setup target HTTPS server
     const serverOptions = {
-      key: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil.key'),
+      key: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil-key.pem'),
       cert: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil.pem'),
     };
     sslServer = https.createServer(serverOptions);
@@ -45,7 +44,7 @@ describe('HttpsProxyAgent', function () {
 
     // setup SSL HTTP proxy server
     const proxyOptions = {
-      key: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil.key'),
+      key: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil-key.pem'),
       cert: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil.pem'),
     };
     sslProxy = createProxy(https.createServer(proxyOptions));
@@ -62,14 +61,14 @@ describe('HttpsProxyAgent', function () {
   describe('constructor', function () {
     it('should accept a "string" proxy argument', function () {
       const agent = new HttpsProxySocket('https://127.0.0.1:12345');
-      assert.equal('127.0.0.1', agent.proxy.host);
-      assert.equal(12345, agent.proxy.port);
+      expect(agent.proxy.host).toBe('127.0.0.1');
+      expect(agent.proxy.port).toBe(12345);
     });
 
     it('should accept a direct argument', function () {
       const agent = new HttpsProxySocket({ host: '127.0.0.1', port: 12345 });
-      assert.equal('127.0.0.1', agent.proxy.host);
-      assert.equal(12345, agent.proxy.port);
+      expect(agent.proxy.host).toBe('127.0.0.1');
+      expect(agent.proxy.port).toBe(12345);
     });
   });
 
@@ -91,8 +90,8 @@ describe('HttpsProxyAgent', function () {
       };
       const agent = makeProxy(proxy);
       const response = await fetch('http://127.0.0.1:' + serverPort, { agent });
-      assert.equal(200, response.status);
-      assert.equal('127.0.0.1:' + serverPort, (await response.json()).host);
+      expect(response.status).toBe(200);
+      expect((await response.json()).host).toBe('127.0.0.1:' + serverPort);
     });
 
     it('should receive the 407 authorization code on the `http.ClientResponse`', async function () {
@@ -107,9 +106,8 @@ describe('HttpsProxyAgent', function () {
 
       try {
         await fetch('http://127.0.0.1:' + serverPort, { agent });
-        assert.fail('Error expected');
       } catch (err: any) {
-        assert.equal(true, /407 Proxy Authentication Required/.test(err.message));
+        expect(/407 Proxy Authentication Required/.test(err.message)).toBe(true);
       }
     });
 
@@ -120,9 +118,8 @@ describe('HttpsProxyAgent', function () {
 
       try {
         await fetch('http://127.0.0.1:' + serverPort, { agent });
-        assert.fail('Error expected');
       } catch (err: any) {
-        assert.equal('ECONNREFUSED', err.code);
+        expect(err.code).toBe('ECONNREFUSED');
       }
     });
   });
@@ -145,29 +142,26 @@ describe('HttpsProxyAgent', function () {
       );
 
       const response = await fetch('https://127.0.0.1:' + sslServerPort, { agent });
-      assert.equal(200, response.status);
-      assert.equal('127.0.0.1:' + sslServerPort, (await response.json()).host);
+      expect(response.status).toBe(200);
+      expect((await response.json()).host).toBe('127.0.0.1:' + sslServerPort);
     });
 
-    // TODO: REDO THE TEST WITH A VALID CERT
+    it('should reject self-signed cert by default', async function () {
+      sslServer.on('request', function (req, res) {
+        res.end(JSON.stringify(req.headers));
+      });
 
-    // it('should reject self-signed cert by default', async function() {
-    //   sslServer.on('request', function(req, res) {
-    //     res.end(JSON.stringify(req.headers));
-    //   });
-    //
-    //   const agent = makeProxy({
-    //     host: '127.0.0.1',
-    //     port: sslProxyPort,
-    //     rejectUnauthorized: false
-    //   });
-    //
-    //   try {
-    //     await fetch('https://127.0.0.1:' + sslServerPort, { agent });
-    //     assert.fail('Error expected');
-    //   } catch (err: any) {
-    //     assert.equal('DEPTH_ZERO_SELF_SIGNED_CERT', err.code);
-    //   }
-    // });
+      const agent = makeProxy({
+        host: '127.0.0.1',
+        port: sslProxyPort,
+        rejectUnauthorized: false,
+      });
+
+      try {
+        await fetch('https://127.0.0.1:' + sslServerPort, { agent });
+      } catch (err: any) {
+        expect(err.code).toBe('DEPTH_ZERO_SELF_SIGNED_CERT');
+      }
+    });
   });
 });
