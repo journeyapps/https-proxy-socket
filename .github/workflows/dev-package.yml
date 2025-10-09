@@ -35,6 +35,9 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
+        with:
+          version: 10
+
 
       - name: Install Dependencies
         uses: ./.github/ci/actions/npm-install
@@ -48,3 +51,4 @@ jobs:
         uses: ./.github/ci/actions/pnpm-publish
         with:
           dev: true
+          version-cli: lerno
