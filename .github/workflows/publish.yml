@@ -33,16 +33,10 @@ jobs:
         with:
           node-version: 22.16
 
-      - name: Enable Corepack
-        run: |
-          npm install -g corepack@latest
-          corepack enable pnpm
-
-      - name: Install Dependencies
-        uses: ./.github/ci/actions/npm-install
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
         with:
-          client: pnpm
-
+          version: 10
 
       - name: Has changesets
         uses: bluwy/detect-changesets-action@v1

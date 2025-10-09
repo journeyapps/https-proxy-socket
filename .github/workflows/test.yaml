@@ -9,10 +9,6 @@ on:
 
 env:
   SECRETS: ${{ toJSON(secrets) }}
-  JOURNEY_PDF_KEY: ${{ secrets.JOURNEY_PDF_KEY }}
-  JOURNEY_PDF_BUCKET: ${{ secrets.JOURNEY_PDF_BUCKET }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
   run-tests:
@@ -30,22 +26,17 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: 22.15
+          node-version: 22.16
 
-      - name: Enable Corepack
-        run: |
-          npm install -g corepack@latest
-          corepack enable pnpm
-          pnpm -v
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
 
       - name: Install Dependencies
         uses: ./.github/ci/actions/npm-install
         with:
           client: pnpm
-
-      - name: Build
-        shell: bash
-        run: pnpm build
 
       - name: Test
         run: pnpm test
