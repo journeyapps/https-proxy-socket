@@ -1,0 +1,51 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+
+env:
+  SECRETS: ${{ toJSON(secrets) }}
+  JOURNEY_PDF_KEY: ${{ secrets.JOURNEY_PDF_KEY }}
+  JOURNEY_PDF_BUCKET: ${{ secrets.JOURNEY_PDF_BUCKET }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  run-tests:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: journeyapps-platform/ci-actions
+          token: ${{ secrets.SHARED_GH_TOKEN }}
+          path: .github/ci
+          ref: v1
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.15
+
+      - name: Enable Corepack
+        run: |
+          npm install -g corepack@latest
+          corepack enable pnpm
+          pnpm -v
+
+      - name: Install Dependencies
+        uses: ./.github/ci/actions/npm-install
+        with:
+          client: pnpm
+
+      - name: Build
+        shell: bash
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test

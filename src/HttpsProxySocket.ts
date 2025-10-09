@@ -50,7 +50,7 @@ export class HttpsProxySocket {
     debug('creating new HttpsProxyAgent instance: %o', sanitizedOptions);
 
     this.proxyConfig = proxyConfig || {};
-    this.proxy = sanitizedOptions;
+    this.proxy = sanitizedOptions as tls.ConnectionOptions;
   }
 
   /**
@@ -64,6 +64,9 @@ export class HttpsProxySocket {
         if (error) {
           reject(error);
         } else {
+          if(!socket){
+            return reject(new Error("No socket returned from proxy"));
+          }
           resolve(socket);
         }
       });
@@ -79,7 +82,7 @@ export class HttpsProxySocket {
     return proxyAgent(this, options);
   }
 
-  private _connect(opts: ConnectionOptions, cb: (error: any, socket: tls.TLSSocket) => void) {
+  private _connect(opts: ConnectionOptions, cb: (error: any, socket: tls.TLSSocket | null) => void) {
     const proxy = this.proxy;
 
     // create a socket connection to the proxy server
@@ -89,8 +92,8 @@ export class HttpsProxySocket {
     // the CONNECT response, so that if the response is anything other than an "200"
     // response code, then we can re-play the "data" events on the socket once the
     // HTTP parser is hooked up...
-    var buffers: Buffer[] = [];
-    var buffersLength = 0;
+    let buffers: Buffer[]  = [];
+    let buffersLength = 0;
 
     function read() {
       var b = socket.read();
@@ -136,7 +139,7 @@ export class HttpsProxySocket {
       if (str.indexOf(END_OF_HEADERS) < 0) {
         // keep buffering
         debug('have not received end of HTTP headers yet...');
-        if (socket.read) {
+        if (socket.readable) {
           read();
         } else {
           socket.once('data', ondata);
@@ -153,7 +156,7 @@ export class HttpsProxySocket {
         const sock = socket;
 
         // nullify the buffered data since we won't be needing it
-        buffers = null;
+        buffers = [];
 
         cleanup();
         cb(null, sock);
@@ -164,7 +167,7 @@ export class HttpsProxySocket {
         cleanup();
 
         // nullify the buffered data since we won't be needing it
-        buffers = null;
+        buffers = [];
 
         cleanup();
         socket.end();
@@ -176,7 +179,7 @@ export class HttpsProxySocket {
     socket.on('close', onclose);
     socket.on('end', onend);
 
-    if (socket.read) {
+    if (socket.readable) {
       read();
     } else {
       socket.once('data', ondata);

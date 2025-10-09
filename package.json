@@ -4,8 +4,24 @@
   "author": "JourneyApps",
   "repository": "journeyapps/https-proxy-socket",
   "license": "MIT",
+  "type": "module",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/esm/index.js",
+      "require": "./lib/cjs/index.js"
+    }
+  },
   "scripts": {
-    "build": "tsc",
+    "ci:publish": "changeset publish && git push --follow-tags",
+    "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
+    "clean": "rm -rf ./lib && tsc -b --clean",
+    "clean:modules": "rm -rf node_modules",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "pnpm build:esm && pnpm build:cjs",
     "test": "mocha src/*.spec.ts",
     "format": "journey-formatter format",
     "deploy": "journey-deploy trigger"
@@ -15,7 +31,7 @@
     "@journeyapps/formatter-cli": "^2.6.2",
     "@types/agent-base": "^4.2.0",
     "@types/mocha": "^5.2.6",
-    "@types/node": "^11.9.4",
+    "@types/node": "^22.18.8",
     "@types/node-fetch": "^2.1.6",
     "assert": "^1.4.1",
     "mocha": "^6.0.2",
@@ -23,11 +39,10 @@
     "node-fetch": "^2.3.0",
     "proxy": "^1.0.1",
     "ts-node": "^8.0.2",
-    "typescript": "^3.7.5"
+    "typescript": "^5.9.3"
   },
-  "main": "./lib/index.js",
   "dependencies": {
-    "agent-base": "^6.0.0",
+    "agent-base": "^6.0.2",
     "socks": "^2.8.7"
   },
   "files": [

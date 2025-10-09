@@ -1,6 +1,6 @@
 import * as socks from 'socks';
 import * as tls from 'tls';
-import {HttpsProxySocket} from './HttpsProxySocket';
+import { HttpsProxySocket } from './HttpsProxySocket';
 
 interface Config {
   /** The journey apps cc egress token */

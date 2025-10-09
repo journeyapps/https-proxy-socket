@@ -1,5 +1,5 @@
 import { HttpsProxySocket } from './HttpsProxySocket';
-import * as agentBase from 'agent-base';
+import agentBase from 'agent-base';
 import * as tls from 'tls';
 
 /**
