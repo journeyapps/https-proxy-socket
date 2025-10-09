@@ -3,8 +3,8 @@
 import * as tls from 'tls';
 import * as url from 'url';
 import { proxyAgent } from './proxyAgent';
-
-const debug = require('debug')('https-proxy');
+import { debug as nodeDebug } from 'util';
+const debug = nodeDebug('https-proxy');
 
 export interface HttpsProxyConfig extends tls.ConnectionOptions {
   headers?: { [key: string]: string };
@@ -38,7 +38,7 @@ export class HttpsProxySocket {
       let parsedOptions = url.parse(opts);
       sanitizedOptions = {
         host: parsedOptions.hostname || parsedOptions.host,
-        port: parseInt(parsedOptions.port || '443')
+        port: parseInt(parsedOptions.port || '443'),
       };
     } else {
       sanitizedOptions = Object.assign({}, opts);
@@ -64,8 +64,8 @@ export class HttpsProxySocket {
         if (error) {
           reject(error);
         } else {
-          if(!socket){
-            return reject(new Error("No socket returned from proxy"));
+          if (!socket) {
+            return reject(new Error('No socket returned from proxy'));
           }
           resolve(socket);
         }
@@ -92,7 +92,7 @@ export class HttpsProxySocket {
     // the CONNECT response, so that if the response is anything other than an "200"
     // response code, then we can re-play the "data" events on the socket once the
     // HTTP parser is hooked up...
-    let buffers: Buffer[]  = [];
+    let buffers: Buffer[] = [];
     let buffersLength = 0;
 
     function read() {
@@ -196,7 +196,7 @@ export class HttpsProxySocket {
     headers['Host'] = host;
 
     headers['Connection'] = 'close';
-    Object.keys(headers).forEach(function(name) {
+    Object.keys(headers).forEach(function (name) {
       msg += name + ': ' + headers[name] + '\r\n';
     });
 

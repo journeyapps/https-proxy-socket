@@ -22,7 +22,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build": "pnpm build:esm && pnpm build:cjs",
-    "test": "mocha src/*.spec.ts",
+    "test": "vitest run",
     "format": "journey-formatter format",
     "deploy": "journey-deploy trigger"
   },
@@ -30,17 +30,17 @@
     "@journeyapps/deploy-cli": "2.6.2",
     "@journeyapps/formatter-cli": "^2.6.2",
     "@types/agent-base": "^4.2.0",
-    "@types/mocha": "^5.2.6",
     "@types/node": "^22.18.8",
     "@types/node-fetch": "^2.1.6",
     "assert": "^1.4.1",
-    "mocha": "^6.0.2",
+    "lerna": "^9.0.0",
     "mssql": "^4.3.2",
     "node-fetch": "^2.3.0",
-    "proxy": "^1.0.1",
+    "prettier": "^3.6.2",
+    "proxy": "^2.2.0",
     "ts-node": "^8.0.2",
-    "lerna": "^9.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "agent-base": "^6.0.2",
