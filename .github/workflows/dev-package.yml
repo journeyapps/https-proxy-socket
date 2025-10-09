@@ -13,7 +13,7 @@ env:
 
 jobs:
   build:
-    name: Publish
+    name: Create Development Packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
