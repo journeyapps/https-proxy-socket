@@ -38,6 +38,12 @@ jobs:
         with:
           version: 10
 
+      - name: Install Dependencies
+        uses: ./.github/ci/actions/npm-install
+        with:
+          client: pnpm
+
+
       - name: Has changesets
         uses: bluwy/detect-changesets-action@v1
         id: detect
