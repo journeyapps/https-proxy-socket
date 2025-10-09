@@ -82,13 +82,13 @@ describe('HttpsProxyAgent', function() {
 
   describe('constructor', function() {
     it('should accept a "string" proxy argument', function() {
-      var agent = new HttpsProxySocket('https://127.0.0.1:12345');
+      const agent = new HttpsProxySocket('https://127.0.0.1:12345');
       assert.equal('127.0.0.1', agent.proxy.host);
       assert.equal(12345, agent.proxy.port);
     });
 
     it('should accept a direct argument', function() {
-      var agent = new HttpsProxySocket({ host: '127.0.0.1', port: 12345 });
+      const agent = new HttpsProxySocket({ host: '127.0.0.1', port: 12345 });
       assert.equal('127.0.0.1', agent.proxy.host);
       assert.equal(12345, agent.proxy.port);
     });
@@ -104,12 +104,12 @@ describe('HttpsProxyAgent', function() {
         res.end(JSON.stringify(req.headers));
       });
 
-      var proxy = {
+      const proxy = {
         host: '127.0.0.1',
         port: sslProxyPort,
         rejectUnauthorized: false
       };
-      var agent = makeProxy(proxy);
+      const agent = makeProxy(proxy);
 
       const response = await fetch('http://127.0.0.1:' + serverPort, { agent });
       assert.equal(200, response.status);
@@ -123,7 +123,7 @@ describe('HttpsProxyAgent', function() {
         fn(null, false);
       };
 
-      var agent = makeProxy({
+      const agent = makeProxy({
         host: '127.0.0.1',
         port: sslProxyPort,
         rejectUnauthorized: false
@@ -132,20 +132,20 @@ describe('HttpsProxyAgent', function() {
       try {
         await fetch('http://127.0.0.1:' + serverPort, { agent });
         assert.fail('Error expected');
-      } catch (err) {
+      } catch (err: any) {
         assert.equal(true, /407 Proxy Authentication Required/.test(err.message));
       }
     });
 
     it('should emit an "error" event on the `http.ClientRequest` if the proxy does not exist', async function() {
       // port 4 is a reserved, but "unassigned" port
-      var proxyUri = 'http://127.0.0.1:4';
-      var agent = makeProxy(proxyUri);
+      const proxyUri = 'http://127.0.0.1:4';
+      const agent = makeProxy(proxyUri);
 
       try {
         await fetch('http://127.0.0.1:' + serverPort, { agent });
         assert.fail('Error expected');
-      } catch (err) {
+      } catch (err: any) {
         assert.equal('ECONNREFUSED', err.code);
       }
     });
@@ -157,13 +157,13 @@ describe('HttpsProxyAgent', function() {
         res.end(JSON.stringify(req.headers));
       });
 
-      var agent = makeProxy(
+      const agent = makeProxy(
         {
           host: '127.0.0.1',
           port: sslProxyPort,
           rejectUnauthorized: false
         },
-        null,
+        undefined,
         { rejectUnauthorized: false }
       );
 
@@ -177,7 +177,7 @@ describe('HttpsProxyAgent', function() {
         res.end(JSON.stringify(req.headers));
       });
 
-      var agent = makeProxy({
+      const agent = makeProxy({
         host: '127.0.0.1',
         port: sslProxyPort,
         rejectUnauthorized: false
@@ -186,7 +186,7 @@ describe('HttpsProxyAgent', function() {
       try {
         await fetch('https://127.0.0.1:' + sslServerPort, { agent });
         assert.fail('Error expected');
-      } catch (err) {
+      } catch (err: any) {
         assert.equal('DEPTH_ZERO_SELF_SIGNED_CERT', err.code);
       }
     });
