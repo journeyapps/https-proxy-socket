@@ -44,10 +44,15 @@ jobs:
         with:
           client: pnpm
 
+      - name: Has changesets
+        uses: bluwy/detect-changesets-action@v1
+        id: detect
+
       - name: Build
         run: pnpm build
 
       - name: Publish dev packages.
+        if: ${{ steps.detect.outputs.has-changesets == 'true' && success() }}
         uses: ./.github/ci/actions/pnpm-publish
         with:
           dev: true
