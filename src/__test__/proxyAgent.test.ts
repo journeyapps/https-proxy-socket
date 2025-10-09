@@ -8,7 +8,6 @@ import { HttpsProxySocket, HttpsProxyConfig } from '../HttpsProxySocket';
 import { proxyAgent } from '../proxyAgent';
 import { ConnectionOptions } from 'tls';
 import { AddressInfo } from 'net';
-
 import fetch from 'node-fetch';
 
 function makeProxy(
@@ -91,7 +90,7 @@ describe('HttpsProxyAgent', function () {
       const agent = makeProxy(proxy);
       const response = await fetch('http://127.0.0.1:' + serverPort, { agent });
       expect(response.status).toBe(200);
-      expect((await response.json()).host).toBe('127.0.0.1:' + serverPort);
+      expect(((await response.json()) as any).host).toBe('127.0.0.1:' + serverPort);
     });
 
     it('should receive the 407 authorization code on the `http.ClientResponse`', async function () {
@@ -143,7 +142,7 @@ describe('HttpsProxyAgent', function () {
 
       const response = await fetch('https://127.0.0.1:' + sslServerPort, { agent });
       expect(response.status).toBe(200);
-      expect((await response.json()).host).toBe('127.0.0.1:' + sslServerPort);
+      expect(((await response.json()) as any).host).toBe('127.0.0.1:' + sslServerPort);
     });
 
     it('should reject self-signed cert by default', async function () {
