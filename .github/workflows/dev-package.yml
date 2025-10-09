@@ -51,4 +51,3 @@ jobs:
         uses: ./.github/ci/actions/pnpm-publish
         with:
           dev: true
-          version-cli: lerno
