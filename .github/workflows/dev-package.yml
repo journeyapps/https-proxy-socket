@@ -1,0 +1,50 @@
+name: Dev Packages
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!master'
+    tags-ignore:
+      - '**'
+env:
+  SECRETS: ${{ toJSON(secrets) }}
+  GITHUB_TOKEN: ${{ secrets.SHARED_GH_TOKEN }}
+
+jobs:
+  build:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{github.event.pull_request.head.sha}}
+          fetch-depth: 0
+
+      - uses: actions/checkout@v4
+        with:
+          repository: journeyapps-platform/ci-actions
+          token: ${{ secrets.SHARED_GH_TOKEN }}
+          path: .github/ci
+          ref: v1
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.16
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+
+      - name: Install Dependencies
+        uses: ./.github/ci/actions/npm-install
+        with:
+          client: pnpm
+
+      - name: Build
+        run: pnpm build
+
+      - name: Publish dev packages.
+        uses: ./.github/ci/actions/pnpm-publish
+        with:
+          dev: true

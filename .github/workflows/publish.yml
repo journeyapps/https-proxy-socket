@@ -51,12 +51,6 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Publish dev packages.
-        if: ${{ github.ref != 'refs/heads/master' && steps.detect.outputs.has-changesets == 'true' && success() }}
-        uses: ./.github/ci/actions/pnpm-publish
-        with:
-          dev: true
-
       - name: Create Release Pull Request or Publish to npm
         if: ${{ github.ref == 'refs/heads/master' && steps.detect.outputs.has-changesets == 'true' }}
         id: changesets
