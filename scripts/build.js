@@ -15,4 +15,14 @@ readdirSync(cjsDir).forEach((file) => {
   }
 });
 
+// Rename .js -> .mjs in ESM folder
+const esmDir = join(process.cwd(), 'lib/esm');
+readdirSync(esmDir).forEach((file) => {
+  if (file.endsWith('.js')) {
+    const oldPath = join(esmDir, file);
+    const newPath = join(esmDir, file.replace(/\.js$/, '.mjs'));
+    renameSync(oldPath, newPath);
+  }
+});
+
 console.log('✅ Build complete: ESM (.js) + CJS (.cjs)');
