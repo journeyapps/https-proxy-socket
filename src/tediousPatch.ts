@@ -1,5 +1,6 @@
 import { HttpsProxySocket } from './HttpsProxySocket.js';
-const debug = require('debug')('https-proxy');
+import { debug as nodeDebug } from 'util';
+const debug = nodeDebug('https-proxy');
 
 /**
  * Replace the connection method on the tedious library (used by mssql)
