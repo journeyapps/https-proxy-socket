@@ -25,9 +25,7 @@ but adapted to expose raw Sockets, instead of just http/https requests.
        * Additional TLS options for the host may be set here, for example:
        * rejectUnauthorized: false, // Disable TLS checks completely (dangerous)
        * ca: fs.readFileSync('my-ca-cert.pem') // Use a custom CA cert
-       */
-
-      /** 
+       *
        * Documentation of the available options is available here:
        * https://nodejs.org/api/tls.html#tls_new_tls_tlssocket_socket_options
        * https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
@@ -108,7 +106,7 @@ See the MongoDB documentation for details: https://www.mongodb.com/docs/drivers/
 
     run().catch(console.error);
 ## JourneyApps MongoDB Token
-Using the Mongo Atlas usually means the connection is a SRV string. Under the hood Mongo driver converts this to a standard connection string. 
+Using Mongo Atlas usually means the connection is a SRV string. Under the hood Mongo driver converts this to a standard connection string. 
 When the driver opens socket connections it will have one for each replica set member. These connections will need to be allowed by the CloudCode egress proxy to work.  
 Prior contacting JourneyApps support, get your SRV string and run the following:
 ```bash
