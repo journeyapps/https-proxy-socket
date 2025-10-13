@@ -14,6 +14,9 @@
       "require": "./lib/cjs/index.js"
     }
   },
+  "bin": {
+    "mongo-replicas": "lib/esm/bin/mongoReplicas.js"
+  },
   "scripts": {
     "ci:publish": "changeset publish && git push --follow-tags",
     "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
@@ -32,7 +35,7 @@
     "node-fetch": "^3.3.2",
     "prettier": "^3.6.2",
     "proxy": "^2.2.0",
-    "ts-node": "^8.0.2",
+    "tedious": "^18.6.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },

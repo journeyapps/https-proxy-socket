@@ -1,5 +1,5 @@
 import { HttpsProxySocket } from './HttpsProxySocket';
-
+import { Connection } from 'tedious';
 const debug = require('debug')('https-proxy');
 
 /**
@@ -10,7 +10,7 @@ const debug = require('debug')('https-proxy');
  */
 export function useProxyForTedious(proxy: HttpsProxySocket) {
   const { Connector } = require('tedious/lib/connector');
-  Connector.prototype.execute = async function(cb: any) {
+  Connector.prototype.execute = async function (cb: any) {
     debug(`opening sql connection to ${this.options.host}:${this.options.port}`);
     try {
       const socket = await proxy.connect(this.options);
