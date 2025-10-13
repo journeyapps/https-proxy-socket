@@ -5,13 +5,18 @@
   "repository": "journeyapps/https-proxy-socket",
   "license": "MIT",
   "type": "module",
-  "main": "./lib/cjs/index.cjs",
+  "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
   "exports": {
     ".": {
-      "import": "./lib/esm/index.js",
-      "require": "./lib/cjs/index.cjs"
+      "import": {
+        "default": "./lib/esm/index.js",
+        "types": "./lib/esm/index.d.ts"
+      },
+      "require": {
+        "default": "./lib/cjs/index.js",
+        "types": "./lib/cjs/index.d.ts"
+      }
     }
   },
   "bin": {
