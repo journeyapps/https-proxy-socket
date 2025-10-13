@@ -1,5 +1,4 @@
 import { HttpsProxySocket } from './HttpsProxySocket';
-import { Connection } from 'tedious';
 const debug = require('debug')('https-proxy');
 
 /**
