@@ -17,6 +17,18 @@
         "default": "./lib/cjs/index.cjs",
         "types": "./lib/cjs/index.d.ts"
       }
+    },
+    "./HttpsProxySocket": {
+      "require": "./lib/cjs/HttpsProxySocket.cjs",
+      "import": "./lib/esm/HttpsProxySocket.mjs"
+    },
+    "./tediousPatch": {
+      "require": "./lib/cjs/tediousPatch.cjs",
+      "import": "./lib/esm/tediousPatch.mjs"
+    },
+    "./mongoPatch": {
+      "require": "./lib/cjs/mongoPatch.cjs",
+      "import": "./lib/esm/mongoPatch.mjs"
     }
   },
   "bin": {
@@ -44,18 +56,6 @@
   "dependencies": {
     "agent-base": "^6.0.2",
     "socks": "^2.8.7"
-  },
-  "./HttpsProxySocket": {
-    "require": "./lib/cjs/HttpsProxySocket.cjs",
-    "import": "./lib/esm/HttpsProxySocket.mjs"
-  },
-  "./tediousPatch": {
-    "require": "./lib/cjs/tediousPatch.cjs",
-    "import": "./lib/esm/tediousPatch.mjs"
-  },
-  "./mongoPatch": {
-    "require": "./lib/cjs/mongoPatch.cjs",
-    "import": "./lib/esm/mongoPatch.mjs"
   },
   "files": [
     "/README.md",
