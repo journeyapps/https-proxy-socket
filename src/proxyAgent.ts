@@ -1,4 +1,4 @@
-import { HttpsProxySocket } from './HttpsProxySocket';
+import { HttpsProxySocket } from './HttpsProxySocket.js';
 import agentBase from 'agent-base';
 import * as tls from 'tls';
 
@@ -9,14 +9,14 @@ import * as tls from 'tls';
  * @param options - to set additional TLS options for https requests, e.g. rejectUnauthorized
  */
 export function proxyAgent(proxy: HttpsProxySocket, options?: tls.ConnectionOptions) {
-  return agentBase(async (req: agentBase.ClientRequest, opts: any) => {
+  return agentBase(async (_, opts: any) => {
     const socket = await proxy.connect(opts);
 
     if (opts.secureEndpoint) {
       // Upgrade to TLS
       let tlsOptions: tls.ConnectionOptions = {
         socket: socket,
-        servername: opts.servername || opts.host
+        servername: opts.servername || opts.host,
       };
       if (typeof opts.rejectUnauthorized != 'undefined') {
         // There's a difference between 'undefined' (equivalent of false) and "not set" (equivalent of true)

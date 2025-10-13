@@ -1,6 +1,6 @@
 import * as socks from 'socks';
 import * as tls from 'tls';
-import { HttpsProxySocket } from './HttpsProxySocket';
+import { HttpsProxySocket } from './HttpsProxySocket.js';
 
 interface Config {
   /** The journey apps cc egress token */
@@ -13,7 +13,7 @@ interface Config {
  *  @param config - The configuration for the proxy
  */
 export function useProxyForMongo(config: Config) {
-  let socket: tls.TLSSocket
+  let socket: tls.TLSSocket;
   socks.SocksClient.createConnection = async (options, callback) => {
     const proxy = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
     return new Promise(async (resolve, reject) => {
@@ -24,6 +24,6 @@ export function useProxyForMongo(config: Config) {
     });
   };
   return {
-    close: () => socket?.end()
-  }
+    close: () => socket?.end(),
+  };
 }

@@ -1,3 +1,3 @@
-export * from './HttpsProxySocket';
-export * from './tediousPatch';
-export * from './mongoPatch';
+export * from './HttpsProxySocket.js';
+export * from './tediousPatch.js';
+export * from './mongoPatch.js';

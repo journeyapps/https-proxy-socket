@@ -1,4 +1,4 @@
-import { HttpsProxySocket } from './HttpsProxySocket';
+import { HttpsProxySocket } from './HttpsProxySocket.js';
 const debug = require('debug')('https-proxy');
 
 /**

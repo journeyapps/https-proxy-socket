@@ -2,7 +2,7 @@
 
 import * as tls from 'tls';
 import * as url from 'url';
-import { proxyAgent } from './proxyAgent';
+import { proxyAgent } from './proxyAgent.js';
 import { debug as nodeDebug } from 'util';
 const debug = nodeDebug('https-proxy');
 
