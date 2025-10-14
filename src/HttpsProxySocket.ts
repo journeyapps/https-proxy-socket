@@ -51,7 +51,7 @@ export class HttpsProxySocket {
    */
   connect(options: ConnectionOptions): Promise<tls.TLSSocket> {
     return new Promise<tls.TLSSocket>(async (resolve, reject) => {
-      await this._connect(options, (error, socket) => {
+      this._connect(options, (error, socket) => {
         if (error) {
           reject(error);
         } else {
@@ -73,7 +73,7 @@ export class HttpsProxySocket {
     return createProxyAgent(this, options);
   }
 
-  private async _connect(opts: ConnectionOptions, cb: (error: any, socket: tls.TLSSocket | null) => void) {
+  private _connect(opts: ConnectionOptions, cb: (error: any, socket: tls.TLSSocket | null) => void) {
     const proxy = this.proxy;
 
     // create a socket connection to the proxy server
