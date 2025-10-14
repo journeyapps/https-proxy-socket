@@ -4,30 +4,47 @@
   "author": "JourneyApps",
   "repository": "journeyapps/https-proxy-socket",
   "license": "MIT",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./lib/esm/index.js",
+        "types": "./lib/esm/index.d.ts"
+      },
+      "require": {
+        "default": "./lib/cjs/index.js",
+        "types": "./lib/cjs/index.d.ts"
+      }
+    }
+  },
+  "bin": {
+    "mongo-replicas": "lib/esm/bin/mongoReplicas.js"
+  },
   "scripts": {
-    "build": "tsc",
-    "test": "mocha src/*.spec.ts",
-    "format": "journey-formatter format",
-    "deploy": "journey-deploy trigger"
+    "ci:publish": "changeset publish && git push --follow-tags",
+    "ci:version": "changeset version && pnpm install --no-frozen-lockfile",
+    "clean": "rm -rf ./lib && tsc -b --clean",
+    "clean:modules": "rm -rf node_modules",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "pnpm build:esm && pnpm build:cjs",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "@journeyapps/deploy-cli": "2.6.2",
-    "@journeyapps/formatter-cli": "^2.6.2",
     "@types/agent-base": "^4.2.0",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^11.9.4",
-    "@types/node-fetch": "^2.1.6",
-    "assert": "^1.4.1",
-    "mocha": "^6.0.2",
-    "mssql": "^4.3.2",
-    "node-fetch": "^2.3.0",
-    "proxy": "^1.0.1",
-    "ts-node": "^8.0.2",
-    "typescript": "^3.7.5"
+    "@types/node": "^24.7.2",
+    "async-listen": "^3.1.0",
+    "lerna": "^9.0.0",
+    "node-fetch": "^3.3.2",
+    "prettier": "^3.6.2",
+    "proxy": "^2.2.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
-  "main": "./lib/index.js",
   "dependencies": {
-    "agent-base": "^6.0.0"
+    "agent-base": "^7.1.4",
+    "socks": "^2.8.7"
   },
   "files": [
     "/README.md",

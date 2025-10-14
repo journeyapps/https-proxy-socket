@@ -5,61 +5,115 @@ Node library to enable opening Socket connections via an HTTPS proxy.
 Based on the implementation in https://github.com/TooTallNate/node-https-proxy-agent,
 but adapted to expose raw Sockets, instead of just http/https requests.
 
-## Installation
+## Proxy for Node mssql (tedious)
+The useProxyForTedious has been removed, if you require this functionality please use v0.2.2 instead.
 
-    yarn add @journeyapps/https-proxy-socket
+## Installation
+```bash
+yarn add @journeyapps/https-proxy-socket
+npm install @journeyapps/https-proxy-socket
+pnpm add @journeyapps/https-proxy-socket
+```
 
 ## Usage - node-fetch
 
-    const { HttpsProxySocket } = require('@journeyapps/https-proxy-socket');
-    const fetch = require('node-fetch');
+```javascript
+import { HttpsProxySocket } from '@journeyapps/https-proxy-socket';
+import fetch from 'node-fetch';
 
-    // Proxy connection options
-    const proxy = new HttpsProxySocket('https://my-proxy.test', {
-      // Proxy auth and headers may be set here, for example:
-      auth: 'myuser:mypassword' // Basic auth
-    });
+/** Proxy connection options */
+const proxy = new HttpsProxySocket('https://my-proxy.test', {
+  /** Proxy auth and headers may be set here, for example: */
+  auth: 'myuser:mypassword', // Basic auth
+});
 
-    const agent = proxy.agent({
-      // Additional TLS options for the host may be set here, for example:
-      // rejectUnauthorized: false, // Disable TLS checks completely (dangerous)
-      // ca: fs.readFileSync('my-ca-cert.pem') // Use a custom CA cert
+const agent = proxy.agent({
+  /**
+   * Additional TLS options for the host may be set here, for example:
+   * rejectUnauthorized: false, // Disable TLS checks completely (dangerous)
+   * ca: fs.readFileSync('my-ca-cert.pem') // Use a custom CA cert
+   *
+   * Documentation of the available options is available here:
+   * https://nodejs.org/api/tls.html#tls_new_tls_tlssocket_socket_options
+   * https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
+   */
+});
 
-      // Documentation of the available options is available here:
-      //  https://nodejs.org/api/tls.html#tls_new_tls_tlssocket_socket_options
-      //  https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
-    });
-
-    const response = await fetch('https://myhost.test', { agent: agent });
+const response = await fetch('https://myhost.test', { agent: agent });
+```
 
 ## Usage - Direct socket
 
-    const { HttpsProxySocket } = require('@journeyapps/https-proxy-socket');
-    const proxy = new HttpsProxySocket('https://my-proxy.test');
+```javascript
+import { HttpsProxySocket } from '@journeyapps/https-proxy-socket';
+const proxy = new HttpsProxySocket('https://my-proxy.test');
 
-    const socket = await proxy.connect({host: 'myhost.test', port: 1234});
+const socket = await proxy.connect({ host: 'myhost.test', port: 1234 });
+```
 
-## Usage - mssql
+## Usage - MongoDB
 
-    const sql = require('mssql')
-    const { HttpsProxySocket, useProxyForTedious } = require('@journeyapps/https-proxy-socket');
+The socks package needs to be added to your package.json dependencies for this to work.
+See the MongoDB documentation for details: https://www.mongodb.com/docs/drivers/node/current/security/socks/
 
-    const proxy = new HttpsProxySocket({
-      // Same as above
-    });
+```javascript
 
-    // Register the proxy globally for tedious/mssql
-    useProxyForTedious(proxy);
+import * as mongo from 'mongodb';
+import { useProxyForMongo } from '@journeyapps/https-proxy-socket';
 
-    async function run() {
-      // Connect using the proxy
-      await sql.connect('mssql://username:pwd@myserver.database.windows.net/mydb?encrypt=true')
-      try {
-        const result = await sql.query`Select TOP(1) * from mytable`
-        console.dir(result);
-      } finally {
-        await sql.close();
-      }
-    }
+const SRV_URI = 'mongodb+srv://<username>:<password>@cluster0.jzuewet.mongodb.net';
+const PROXY = 'us-cc-proxy.journeyapps.com'; // Or za-cc-proxy.journeyapps.com
+const PROXY_PORT = 443
 
-    run().catch(console.error);
+/**
+ * Register the proxy globally for MongoDB
+ * This retuens a close function to end the socket
+ */
+const { close } = useProxyForMongo({
+  proxy: PROXY,
+  auth: <egress_token> // See JourneyApps MongoDB Token section below
+});
+
+async function run() {
+  const client = new mongo.MongoClient(SRV_URI, {
+    proxyPort: PROXY_PORT,
+    proxyHost: PROXY,
+  });
+  try {
+    const database = client.db('poc');
+    const data = database.collection('data');
+
+    const results = await data.find({ index: { $lt: 5 } }).toArray();
+    console.log(results);
+  } finally {
+    close()
+    await client.close();
+  }
+}
+
+run().catch(console.error);
+```
+
+## JourneyApps MongoDB Token
+
+Using Mongo Atlas usually means the connection is a SRV string. Under the hood Mongo driver converts this to a standard connection string.
+When the driver opens socket connections it will have one for each replica set member. These connections will need to be allowed by the CloudCode egress proxy to work.  
+Before contacting JourneyApps support to get your egress token, retrieve your SRV string from Atlas and run the following commands to get the replicas domains:
+
+```bash
+# your SRV is mongodb+srv://<username>:<password>@cluster1.vlnzcbp.mongodb.net
+# You can run it with the included credentials
+npx @journeyapps/https-proxy-socket mongo-replicas mongodb+srv://your_username:your_password@cluster1.vlnzcbp.mongodb.net
+# Or without
+npx @journeyapps/https-proxy-socket mongo-replicas mongodb+srv://cluster1.vlnzcbp.mongodb.net
+```
+
+This will output the below to your console:
+
+```javascript
+{
+  replicas: 'ac-mayaavr-shard-00-02.vlnzcbp.mongodb.net:27017,ac-mayaavr-shard-00-01.vlnzcbp.mongodb.net:27017,ac-mayaavr-shard-00-00.vlnzcbp.mongodb.net:27017';
+}
+```
+
+When requesting the token from JourneyApps support, please provide the replicas string as well.
