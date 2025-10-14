@@ -2,10 +2,10 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
 import { createProxy } from 'proxy';
-import { describe, afterEach, it, beforeEach, expect } from 'vitest';
-
-import { HttpsProxySocket, HttpsProxyConfig } from '../HttpsProxySocket';
-import { proxyAgent } from '../proxyAgent';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import listen from 'async-listen';
+import { HttpsProxyConfig, HttpsProxySocket } from '../HttpsProxySocket';
+import { createProxyAgent } from '../createProxyAgent';
 import { ConnectionOptions } from 'tls';
 import { AddressInfo } from 'net';
 import fetch from 'node-fetch';
@@ -15,7 +15,7 @@ function makeProxy(
   opts?: HttpsProxyConfig,
   agentOptions?: ConnectionOptions,
 ): http.Agent {
-  return proxyAgent(new HttpsProxySocket(url, opts), agentOptions) as any as http.Agent;
+  return createProxyAgent(new HttpsProxySocket(url, opts), agentOptions) as any as http.Agent;
 }
 
 describe('HttpsProxyAgent', function () {
@@ -27,31 +27,33 @@ describe('HttpsProxyAgent', function () {
 
   let sslProxy: any;
   let sslProxyPort: number;
-  beforeEach(() => {
+  beforeAll(async () => {
     server = http.createServer();
-    server.listen();
+    await listen(server);
     serverPort = (server.address() as AddressInfo).port;
+  });
 
-    // setup target HTTPS server
+  beforeAll(async () => {
     const serverOptions = {
       key: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil-key.pem'),
       cert: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil.pem'),
     };
     sslServer = https.createServer(serverOptions);
-    sslServer.listen();
+    await listen(sslServer);
     sslServerPort = (sslServer.address() as AddressInfo).port;
+  });
 
-    // setup SSL HTTP proxy server
+  beforeAll(async () => {
     const proxyOptions = {
       key: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil-key.pem'),
       cert: fs.readFileSync(__dirname + '/../../fixtures/ssl-cert-snakeoil.pem'),
     };
     sslProxy = createProxy(https.createServer(proxyOptions));
-    sslProxy.listen();
+    await listen(sslProxy);
     sslProxyPort = sslProxy.address().port;
   });
 
-  afterEach(() => {
+  afterAll(() => {
     server.close();
     sslServer.close();
     sslProxy.close();
@@ -77,6 +79,7 @@ describe('HttpsProxyAgent', function () {
     });
 
     it('should work over an HTTPS proxy', async function () {
+      const SERVER_URL = `http://127.0.0.1:${serverPort}`;
       server.once('request', function (req, res) {
         res.end(JSON.stringify(req.headers));
       });
@@ -88,12 +91,13 @@ describe('HttpsProxyAgent', function () {
         rejectUnauthorized: false,
       };
       const agent = makeProxy(proxy);
-      const response = await fetch('http://127.0.0.1:' + serverPort, { agent });
+      const response = await fetch(SERVER_URL, { agent });
       expect(response.status).toBe(200);
       expect(((await response.json()) as any).host).toBe('127.0.0.1:' + serverPort);
     });
 
     it('should receive the 407 authorization code on the `http.ClientResponse`', async function () {
+      const SERVER_URL = `http://127.0.0.1:${serverPort}`;
       // set a proxy authentication function for this test
       sslProxy.authenticate = () => false;
       const agent = makeProxy({
@@ -104,19 +108,20 @@ describe('HttpsProxyAgent', function () {
       });
 
       try {
-        await fetch('http://127.0.0.1:' + serverPort, { agent });
+        await fetch(SERVER_URL, { agent });
       } catch (err: any) {
         expect(/407 Proxy Authentication Required/.test(err.message)).toBe(true);
       }
     });
 
     it('should emit an "error" event on the `http.ClientRequest` if the proxy does not exist', async function () {
+      const SERVER_URL = `http://127.0.0.1:${serverPort}`;
       // port 4 is a reserved, but "unassigned" port
       const proxyUri = 'http://127.0.0.1:4';
       const agent = makeProxy(proxyUri);
 
       try {
-        await fetch('http://127.0.0.1:' + serverPort, { agent });
+        await fetch(SERVER_URL, { agent });
       } catch (err: any) {
         expect(err.code).toBe('ECONNREFUSED');
       }
@@ -125,14 +130,13 @@ describe('HttpsProxyAgent', function () {
 
   describe('"https" module', function () {
     it('should work over an HTTPS proxy', async function () {
+      const SERVER_URL = `https://127.0.0.1:${sslServerPort}`;
       sslServer.on('request', function (req, res) {
         res.end(JSON.stringify(req.headers));
       });
-
       const agent = makeProxy(
         {
           host: '127.0.0.1',
-          servername: 'localhost',
           port: sslProxyPort,
           rejectUnauthorized: false,
         },
@@ -140,12 +144,13 @@ describe('HttpsProxyAgent', function () {
         { rejectUnauthorized: false },
       );
 
-      const response = await fetch('https://127.0.0.1:' + sslServerPort, { agent });
+      const response = await fetch(SERVER_URL, { agent });
       expect(response.status).toBe(200);
-      expect(((await response.json()) as any).host).toBe('127.0.0.1:' + sslServerPort);
+      expect(((await response.json()) as any).host).toBe(`127.0.0.1:${sslServerPort}`);
     });
 
     it('should reject self-signed cert by default', async function () {
+      const SERVER_URL = `https://127.0.0.1:${sslServerPort}`;
       sslServer.on('request', function (req, res) {
         res.end(JSON.stringify(req.headers));
       });
@@ -157,7 +162,7 @@ describe('HttpsProxyAgent', function () {
       });
 
       try {
-        await fetch('https://127.0.0.1:' + sslServerPort, { agent });
+        await fetch(SERVER_URL, { agent });
       } catch (err: any) {
         expect(err.code).toBe('DEPTH_ZERO_SELF_SIGNED_CERT');
       }
