@@ -5,8 +5,8 @@ Node library to enable opening Socket connections via an HTTPS proxy.
 Based on the implementation in https://github.com/TooTallNate/node-https-proxy-agent,
 but adapted to expose raw Sockets, instead of just http/https requests.
 
-### Note on tedious and mssql  
-The useProxyForTedious has been removed, if you require this functionality please use v0.2.2. 
+## Proxy for Node mssql (tedious)
+The useProxyForTedious has been removed, if you require this functionality please use v0.2.2 instead.
 
 ## Installation
 ```bash
