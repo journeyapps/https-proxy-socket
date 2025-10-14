@@ -98,7 +98,7 @@ run().catch(console.error);
 
 Using Mongo Atlas usually means the connection is a SRV string. Under the hood Mongo driver converts this to a standard connection string.
 When the driver opens socket connections it will have one for each replica set member. These connections will need to be allowed by the CloudCode egress proxy to work.  
-Prior contacting JourneyApps support, get your SRV string and run the following:
+Before contacting JourneyApps support to get your egress token, retrieve your SRV string from Atlas and run the following commands to get the replicas domains:
 
 ```bash
 # your SRV is mongodb+srv://<username>:<password>@cluster1.vlnzcbp.mongodb.net
