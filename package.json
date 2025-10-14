@@ -32,6 +32,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.7",
     "@types/agent-base": "^4.2.0",
     "@types/node": "^24.7.2",
     "async-listen": "^3.1.0",
