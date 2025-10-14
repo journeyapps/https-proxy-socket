@@ -1,12 +1,6 @@
 name: Dev Packages
 
-on:
-  push:
-    branches:
-      - '**'
-      - '!master'
-    tags-ignore:
-      - '**'
+on: workflow_dispatch
 env:
   SECRETS: ${{ toJSON(secrets) }}
   GITHUB_TOKEN: ${{ secrets.SHARED_GH_TOKEN }}
@@ -52,7 +46,7 @@ jobs:
         run: pnpm build
 
       - name: Publish dev packages.
-        if: ${{ steps.detect.outputs.has-changesets == 'true' && success() }}
+        if: ${{ success() }}
         uses: ./.github/ci/actions/pnpm-publish
         with:
           dev: true
