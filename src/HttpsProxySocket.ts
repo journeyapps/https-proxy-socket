@@ -1,11 +1,10 @@
+// Based on https://github.com/TooTallNate/node-https-proxy-agent
+
 import * as tls from 'tls';
-import { createProxyAgent } from './createProxyAgent';
-import { setServername } from './utils/setServername';
-import { parseOptions } from './utils/parseOptions';
+import * as url from 'url';
+import { proxyAgent } from './proxyAgent';
 
-import { debug as nodeDebug } from 'util';
-
-const debug = nodeDebug('https-proxy');
+const debug = require('debug')('https-proxy');
 
 export interface HttpsProxyConfig extends tls.ConnectionOptions {
   headers?: { [key: string]: string };
@@ -28,36 +27,43 @@ export class HttpsProxySocket {
 
   /**
    *
-   * @param options - The connection options to the proxy. At least host and port are required.
+   * @param opts - The connection options to the proxy. At least host and port are required.
    *               Use {rejectUnauthorized: true} to ignore certificates for the proxy (not the endpoint).
    * @param proxyConfig - { auth: 'username:password' } for basic auth.
    *                      { headers: {key: 'value'} } for custom headers.
    */
-  constructor(options: tls.ConnectionOptions | string, proxyConfig?: HttpsProxyConfig) {
-    const sanitizedOptions = parseOptions(options);
-    if (!options) {
+  constructor(opts: tls.ConnectionOptions | string, proxyConfig?: HttpsProxyConfig) {
+    let sanitizedOptions;
+    if (typeof opts == 'string') {
+      let parsedOptions = url.parse(opts);
+      sanitizedOptions = {
+        host: parsedOptions.hostname || parsedOptions.host,
+        port: parseInt(parsedOptions.port || '443')
+      };
+    } else {
+      sanitizedOptions = Object.assign({}, opts);
+    }
+
+    if (!opts) {
       throw new Error('an HTTP(S) proxy server `host` and `port` must be specified!');
     }
     debug('creating new HttpsProxyAgent instance: %o', sanitizedOptions);
 
     this.proxyConfig = proxyConfig || {};
-    this.proxy = sanitizedOptions as tls.ConnectionOptions;
+    this.proxy = sanitizedOptions;
   }
 
   /**
    * Create a new Socket connection.
    *
-   * @param options - host and port
+   * @param opts - host and port
    */
-  connect(options: ConnectionOptions): Promise<tls.TLSSocket> {
-    return new Promise<tls.TLSSocket>(async (resolve, reject) => {
-      this._connect(options, (error, socket) => {
+  connect(opts: ConnectionOptions): Promise<tls.TLSSocket> {
+    return new Promise<tls.TLSSocket>((resolve, reject) => {
+      this._connect(opts, (error, socket) => {
         if (error) {
           reject(error);
         } else {
-          if (!socket) {
-            return reject(new Error('No socket returned from proxy'));
-          }
           resolve(socket);
         }
       });
@@ -70,21 +76,21 @@ export class HttpsProxySocket {
    * @param options - to set additional TLS options for https requests, e.g. rejectUnauthorized
    */
   agent(options?: tls.ConnectionOptions) {
-    return createProxyAgent(this, options);
+    return proxyAgent(this, options);
   }
 
-  private _connect(opts: ConnectionOptions, cb: (error: any, socket: tls.TLSSocket | null) => void) {
+  private _connect(opts: ConnectionOptions, cb: (error: any, socket: tls.TLSSocket) => void) {
     const proxy = this.proxy;
 
     // create a socket connection to the proxy server
-    const socket = tls.connect(setServername(proxy));
+    const socket = tls.connect(proxy);
 
     // we need to buffer any HTTP traffic that happens with the proxy before we get
     // the CONNECT response, so that if the response is anything other than an "200"
     // response code, then we can re-play the "data" events on the socket once the
     // HTTP parser is hooked up...
-    let buffers: Buffer[] = [];
-    let buffersLength = 0;
+    var buffers: Buffer[] = [];
+    var buffersLength = 0;
 
     function read() {
       var b = socket.read();
@@ -130,7 +136,7 @@ export class HttpsProxySocket {
       if (str.indexOf(END_OF_HEADERS) < 0) {
         // keep buffering
         debug('have not received end of HTTP headers yet...');
-        if (socket.readable) {
+        if (socket.read) {
           read();
         } else {
           socket.once('data', ondata);
@@ -147,7 +153,7 @@ export class HttpsProxySocket {
         const sock = socket;
 
         // nullify the buffered data since we won't be needing it
-        buffers = [];
+        buffers = null;
 
         cleanup();
         cb(null, sock);
@@ -158,7 +164,7 @@ export class HttpsProxySocket {
         cleanup();
 
         // nullify the buffered data since we won't be needing it
-        buffers = [];
+        buffers = null;
 
         cleanup();
         socket.end();
@@ -170,22 +176,24 @@ export class HttpsProxySocket {
     socket.on('close', onclose);
     socket.on('end', onend);
 
-    if (socket.readable) {
+    if (socket.read) {
       read();
     } else {
       socket.once('data', ondata);
     }
 
     const host = `${opts.host}:${opts.port}`;
-    let msg = 'CONNECT ' + host + ' HTTP/1.1\r\n';
+    var msg = 'CONNECT ' + host + ' HTTP/1.1\r\n';
 
-    const headers = Object.assign({}, this.proxyConfig.headers);
+    var headers = Object.assign({}, this.proxyConfig.headers);
     if (this.proxyConfig.auth) {
       headers['Proxy-Authorization'] = 'Basic ' + Buffer.from(this.proxyConfig.auth).toString('base64');
     }
+
     headers['Host'] = host;
+
     headers['Connection'] = 'close';
-    Object.keys(headers).forEach(function (name) {
+    Object.keys(headers).forEach(function(name) {
       msg += name + ': ' + headers[name] + '\r\n';
     });
 
