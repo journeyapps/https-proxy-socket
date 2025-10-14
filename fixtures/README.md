@@ -1,5 +1,5 @@
 ### SnakeOil Certificates
-If the year is 2045 or for some or other reason you need to generate new snakeoil certificates do the following.   
+If the year is 2045 or you have to regenerate new snakeoil certificates do the following.   
 ---
 Please install:  
 - [CloudFlare cfssl](https://github.com/cloudflare/cfssl)     
