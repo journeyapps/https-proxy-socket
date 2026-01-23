@@ -13,17 +13,23 @@ interface Config {
  *  @param config - The configuration for the proxy
  */
 export function useProxyForMongo(config: Config) {
-  let socket: tls.TLSSocket;
+  const sockets: tls.TLSSocket[] = [];
   socks.SocksClient.createConnection = async (options, callback) => {
     const proxy = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
-    return new Promise(async (resolve, reject) => {
-      socket = await proxy.connect({ host: options.destination.host, port: options.destination.port });
-      resolve({
-        socket,
-      });
-    });
+    const socket = await proxy.connect({ host: options.destination.host, port: options.destination.port });
+    sockets.push(socket)
+    return {
+      socket
+    };
   };
   return {
-    close: () => socket?.end(),
+    close: async () => {
+      for (const socket of sockets) {
+        await new Promise((resolve, reject) => {
+          socket.once('close', () => resolve);
+          socket.end()
+        })
+      }
+    },
   };
 }
