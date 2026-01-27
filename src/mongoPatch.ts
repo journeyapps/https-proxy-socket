@@ -8,6 +8,9 @@ interface Config {
   /** The journey apps cc egress proxy domain */
   proxy: string;
 }
+
+const originalCreateConnection = socks.SocksClient.createConnection;
+
 /**
  *  The patch should be called before instantiating the MongoClient
  *  @param config - The configuration for the proxy
@@ -30,12 +33,16 @@ export function useProxyForMongo(config: Config) {
         sockets.map(
           (socket) =>
             new Promise<void>((resolve) => {
-              socket.once('close', resolve);
+              socket.once('close', ()=>{
+                console.log('Socket closed');
+                resolve();
+              });
               socket.destroy();
             }),
         ),
       );
       sockets.length = 0;
+      socks.SocksClient.createConnection = originalCreateConnection;
     },
   };
 }
