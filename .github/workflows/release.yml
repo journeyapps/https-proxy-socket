@@ -1,8 +1,10 @@
 name: Release
+
+
 on:
   push:
     branches: [master]
-  workflow_dispatch: # For dev publishing
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
@@ -10,26 +12,13 @@ permissions:
   contents: write # Required for changesets pushing commits
   pull-requests: write # Required for changesets creating PRs
 
-env:
-  SECRETS: ${{ toJSON(secrets) }}
-  GITHUB_TOKEN: ${{ secrets.SHARED_GH_TOKEN }}
-
 jobs:
-  release:
-    name: Publish Packages
+  realeas:
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{github.event.pull_request.head.sha}}
-          fetch-depth: 0
-
-      - uses: actions/checkout@v4
-        with:
-          repository: journeyapps-platform/ci-actions
-          token: ${{ secrets.SHARED_GH_TOKEN }}
-          path: .github/ci
-          ref: v1
+      - name: Checkout Repo
+        uses: actions/checkout@v5
 
       - name: Enable Corepack
         run: corepack enable
@@ -50,10 +39,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-
-      - name: Has changesets
-        uses: bluwy/detect-changesets-action@v1
-        id: detect
 
       - name: Build
         run: pnpm build
