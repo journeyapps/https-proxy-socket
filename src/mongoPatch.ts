@@ -28,21 +28,23 @@ export function useProxyForMongo(config: Config) {
   };
   return {
     close: async () => {
-      console.log(`Closing ${sockets.length} open proxy sockets`);
+      let count = 0;
       await Promise.all(
         sockets.map(
           (socket) =>
             new Promise<void>((resolve) => {
-              socket.once('close', ()=>{
-                console.log('Socket closed');
+              socket.once('close', () => {
+                count++;
                 resolve();
               });
               socket.destroy();
             }),
         ),
       );
-      sockets.length = 0;
-      socks.SocksClient.createConnection = originalCreateConnection;
+      if (count === sockets.length) {
+        console.log(`Closed ${sockets.length} MongoDB connection sockets`);
+        process.exit(0);
+      }
     },
   };
 }
