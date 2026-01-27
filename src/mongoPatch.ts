@@ -14,8 +14,8 @@ interface Config {
  */
 export function useProxyForMongo(config: Config) {
   const sockets: tls.TLSSocket[] = [];
-  const proxy = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
   socks.SocksClient.createConnection = async (options, callback) => {
+    const proxy = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
     const socket = await proxy.connect({ host: options.destination.host, port: options.destination.port });
     sockets.push(socket);
     return {
@@ -28,8 +28,7 @@ export function useProxyForMongo(config: Config) {
       for (const socket of sockets) {
         await new Promise((resolve, reject) => {
           socket.on('close', () => {
-            console.log(`Socket ${socket.remoteAddress}: `, socket.closed);
-            console.log('Socket is paused: ', socket.isPaused());
+            socket.unref();
             resolve(true);
           });
           socket.end();
