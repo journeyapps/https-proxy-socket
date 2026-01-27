@@ -28,11 +28,10 @@ export function useProxyForMongo(config: Config) {
       for (const socket of sockets) {
         await new Promise((resolve, reject) => {
           socket.once('close', () => {
-            resolve(null);
+            console.log({ socket });
+            resolve(socket);
           });
-          socket.end(()=>{
-            console.log('Ended socket to', socket.remoteAddress, socket.remotePort);
-          })
+          socket.end();
         });
       }
     },
