@@ -17,7 +17,7 @@ export function useProxyForMongo(config: Config) {
   socks.SocksClient.createConnection = async (options, callback) => {
     const proxy = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
     const socket = await proxy.connect({ host: options.destination.host, port: options.destination.port });
-    socket.unref()
+    socket.unref();
     sockets.push(socket);
     return {
       socket,
