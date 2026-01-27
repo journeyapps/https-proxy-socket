@@ -48,13 +48,15 @@ jobs:
         uses: changesets/action@v1
         if: ${{ github.event_name == 'push' }}
         with:
+          publish: pnpm ci:publish
           version: pnpm changeset:version
-          publish: ci:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Dev packages
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: pnpm ci:version
+        run: |
+          pnpm changeset version --no-git-tag --snapshot dev
+          pnpm changeset publish --tag dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
