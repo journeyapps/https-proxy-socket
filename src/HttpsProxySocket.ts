@@ -149,7 +149,7 @@ export class HttpsProxySocket {
         // nullify the buffered data since we won't be needing it
         buffers = [];
 
-        cleanup();
+        // cleanup();
         cb(null, sock);
       } else {
         // some other status code that's not 200... need to re-play the HTTP header
