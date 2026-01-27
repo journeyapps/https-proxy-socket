@@ -10,6 +10,10 @@ permissions:
   contents: write # Required for changesets pushing commits
   pull-requests: write # Required for changesets creating PRs
 
+env:
+  SECRETS: ${{ toJSON(secrets) }}
+  GITHUB_TOKEN: ${{ secrets.SHARED_GH_TOKEN }}
+
 jobs:
   release:
     name: Publish Packages
@@ -64,7 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Dev publish
+      - name: Dev packages
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: pnpm ci:version
         env:
