@@ -20,7 +20,6 @@ export function useProxyForMongo(config: Config) {
   socks.SocksClient.createConnection = async (options, callback) => {
     const proxy = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
     const socket = await proxy.connect({ host: options.destination.host, port: options.destination.port });
-    socket.unref();
     sockets.push(socket);
     return {
       socket,
@@ -37,13 +36,12 @@ export function useProxyForMongo(config: Config) {
                 count++;
                 resolve();
               });
-              socket.destroy();
+              socket.end();
             }),
         ),
       );
       if (count === sockets.length) {
         console.log(`Closed ${sockets.length} MongoDB connection sockets`);
-        process.exit(0);
       }
     },
   };
