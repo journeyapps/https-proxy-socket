@@ -3,9 +3,9 @@ import { createProxyAgent } from './createProxyAgent';
 import { setServername } from './utils/setServername';
 import { parseOptions } from './utils/parseOptions';
 
-// import { debug as nodeDebug } from 'util';
-//
-// const debug = nodeDebug('https-proxy');
+import { debug as nodeDebug } from 'util';
+
+const debug = nodeDebug('https-proxy');
 
 export interface HttpsProxyConfig extends tls.ConnectionOptions {
   headers?: { [key: string]: string };
@@ -38,7 +38,7 @@ export class HttpsProxySocket {
     if (!options) {
       throw new Error('an HTTP(S) proxy server `host` and `port` must be specified!');
     }
-    console.log('creating new HttpsProxyAgent instance: %o', sanitizedOptions);
+    debug('creating new HttpsProxyAgent instance: %o', sanitizedOptions);
 
     this.proxyConfig = proxyConfig || {};
     this.proxy = sanitizedOptions as tls.ConnectionOptions;
@@ -104,11 +104,11 @@ export class HttpsProxySocket {
     }
 
     function onclose(err: any) {
-      console.log('onclose had error %o', err);
+      debug('onclose had error %o', err);
     }
 
     function onend() {
-      console.log('onend');
+      debug('onend');
     }
 
     function onerror(err: any) {
@@ -129,7 +129,7 @@ export class HttpsProxySocket {
 
       if (str.indexOf(END_OF_HEADERS) < 0) {
         // keep buffering
-        console.log('have not received end of HTTP headers yet...');
+        debug('have not received end of HTTP headers yet...');
         if (socket.readable) {
           read();
         } else {
@@ -140,7 +140,7 @@ export class HttpsProxySocket {
 
       const firstLine = str.substring(0, str.indexOf('\r\n'));
       const statusCode = parseInt(firstLine.split(' ')[1], 10);
-      console.log('got proxy server response: %o', firstLine);
+      debug('got proxy server response: %o', firstLine);
 
       if (200 == statusCode) {
         // 200 Connected status code!

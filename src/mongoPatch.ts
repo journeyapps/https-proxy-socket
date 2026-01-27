@@ -15,9 +15,15 @@ interface Config {
  */
 export function useProxyForMongo(config: Config) {
   const sockets: tls.TLSSocket[] = [];
-  let proxy: HttpsProxySocket | undefined = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
+  const proxy: HttpsProxySocket = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
   socks.SocksClient.createConnection = async (options, callback) => {
-    const socket = await proxy!.connect({ host: options.destination.host, port: options.destination.port });
+    const socket = await proxy.connect({ host: options.destination.host, port: options.destination.port });
+
+    socket.on('error', (err) => {
+      if (err) {
+        console.error('MongoDB connection socket error:', err);
+      }
+    });
     sockets.push(socket);
     return {
       socket,
@@ -32,13 +38,14 @@ export function useProxyForMongo(config: Config) {
             new Promise<void>((resolve) => {
               socket.once('close', () => {
                 count++;
+                socket.removeAllListeners();
+                socket.destroySoon();
                 resolve();
               });
               socket.end();
             }),
         ),
       );
-      proxy = undefined;
       if (count === sockets.length) {
         console.log(`Closed ${sockets.length} MongoDB connection sockets`);
       }
