@@ -39,7 +39,8 @@ export function useProxyForMongo(config: Config) {
               socket.once('close', () => {
                 count++;
                 socket.removeAllListeners();
-                socket.destroySoon();
+                socket.unref();
+                socket.destroy(new Error('Socket closed by user'));
                 resolve();
               });
               socket.end();
