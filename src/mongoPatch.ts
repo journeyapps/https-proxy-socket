@@ -9,8 +9,6 @@ interface Config {
   proxy: string;
 }
 
-const originalCreateConnection = socks.SocksClient.createConnection;
-
 /**
  *  The patch should be called before instantiating the MongoClient
  *  @param config - The configuration for the proxy

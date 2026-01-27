@@ -3,9 +3,9 @@ import { createProxyAgent } from './createProxyAgent';
 import { setServername } from './utils/setServername';
 import { parseOptions } from './utils/parseOptions';
 
-import { debug as nodeDebug } from 'util';
-
-const debug = nodeDebug('https-proxy');
+// import { debug as nodeDebug } from 'util';
+//
+// const debug = nodeDebug('https-proxy');
 
 export interface HttpsProxyConfig extends tls.ConnectionOptions {
   headers?: { [key: string]: string };
@@ -38,7 +38,7 @@ export class HttpsProxySocket {
     if (!options) {
       throw new Error('an HTTP(S) proxy server `host` and `port` must be specified!');
     }
-    debug('creating new HttpsProxyAgent instance: %o', sanitizedOptions);
+    console.log('creating new HttpsProxyAgent instance: %o', sanitizedOptions);
 
     this.proxyConfig = proxyConfig || {};
     this.proxy = sanitizedOptions as tls.ConnectionOptions;
@@ -87,7 +87,7 @@ export class HttpsProxySocket {
     let buffersLength = 0;
 
     function read() {
-      var b = socket.read();
+      const b = socket.read();
       if (b) {
         ondata(b);
       } else {
@@ -104,11 +104,11 @@ export class HttpsProxySocket {
     }
 
     function onclose(err: any) {
-      debug('onclose had error %o', err);
+      console.log('onclose had error %o', err);
     }
 
     function onend() {
-      debug('onend');
+      console.log('onend');
     }
 
     function onerror(err: any) {
@@ -129,7 +129,7 @@ export class HttpsProxySocket {
 
       if (str.indexOf(END_OF_HEADERS) < 0) {
         // keep buffering
-        debug('have not received end of HTTP headers yet...');
+        console.log('have not received end of HTTP headers yet...');
         if (socket.readable) {
           read();
         } else {
@@ -140,7 +140,7 @@ export class HttpsProxySocket {
 
       const firstLine = str.substring(0, str.indexOf('\r\n'));
       const statusCode = parseInt(firstLine.split(' ')[1], 10);
-      debug('got proxy server response: %o', firstLine);
+      console.log('got proxy server response: %o', firstLine);
 
       if (200 == statusCode) {
         // 200 Connected status code!
