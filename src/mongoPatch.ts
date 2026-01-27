@@ -27,9 +27,11 @@ export function useProxyForMongo(config: Config) {
       console.log(`Closing ${sockets.length} open proxy sockets`);
       for (const socket of sockets) {
         await new Promise((resolve, reject) => {
-          socket.setKeepAlive(false);
           socket.once('close', () => resolve);
           socket.end();
+          setTimeout(() => {
+            resolve(socket.destroy());
+          }, 3000);
         });
       }
     },
