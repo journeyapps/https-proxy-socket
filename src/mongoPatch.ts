@@ -26,12 +26,16 @@ export function useProxyForMongo(config: Config) {
   return {
     close: async () => {
       console.log(`Closing ${sockets.length} open proxy sockets`);
-      for (const socket of sockets) {
-        await new Promise((resolve, reject) => {
-          socket.on('close', () => resolve(null));
-          socket.end();
-        });
-      }
+      await Promise.all(
+        sockets.map(
+          (socket) =>
+            new Promise<void>((resolve) => {
+              socket.once('close', resolve);
+              socket.destroy();
+            }),
+        ),
+      );
+      sockets.length = 0;
     },
   };
 }
