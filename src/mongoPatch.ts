@@ -27,10 +27,15 @@ export function useProxyForMongo(config: Config) {
       console.log(`Closing ${sockets.length} open proxy sockets`);
       for (const socket of sockets) {
         await new Promise((resolve, reject) => {
-          socket.on('close', () => resolve);
+          socket.on('close', () => {
+            console.log(`Socket ${socket.address()}: `, socket.closed);
+            console.log('Socket is paused: ', socket.isPaused());
+            resolve(true);
+          });
           socket.end();
         });
       }
+      return Promise.resolve(true);
     },
   };
 }
