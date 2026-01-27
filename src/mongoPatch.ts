@@ -36,7 +36,7 @@ export function useProxyForMongo(config: Config) {
                 count++;
                 resolve();
               });
-              socket.end();
+              socket.destroy();
             }),
         ),
       );
