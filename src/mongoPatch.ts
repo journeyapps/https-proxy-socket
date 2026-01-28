@@ -36,7 +36,7 @@ export function useProxyForMongo(config: Config) {
         sockets.map(
           (socket) =>
             new Promise<void>((resolve) => {
-              socket.once('close', () => {
+              socket.once('finish', () => {
                 count++;
                 resolve();
               });
@@ -44,10 +44,18 @@ export function useProxyForMongo(config: Config) {
             }),
         ),
       );
-      if (count === sockets.length) {
-        console.log(`Closed ${sockets.length} MongoDB connection sockets`);
+      // if (count === sockets.length) {
+      //   console.log(`Closed ${sockets.length} MongoDB connection sockets`);
+      // }
+      for (const socket of sockets) {
+        console.log('---------------------------------------------');
+        console.log('Socket destroyed', socket.destroyed);
+        console.log('Socket readable', socket.readable);
+        console.log('Socket writable', socket.writable);
+        console.log('Socket closed', socket.closed);
+        console.log('---------------------------------------------');
       }
-      console.log(sockets);
+      sockets.length = 0;
     },
   };
 }
