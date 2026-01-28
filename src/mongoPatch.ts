@@ -16,6 +16,7 @@ interface Config {
 export function useProxyForMongo(config: Config) {
   let sockets: tls.TLSSocket[] = [];
   socks.SocksClient.createConnection = async (options, callback) => {
+    options.existing_socket?.destroy();
     const socket = await new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth }).connect({
       host: options.destination.host,
       port: options.destination.port,
@@ -31,23 +32,17 @@ export function useProxyForMongo(config: Config) {
   };
   return {
     close: async () => {
-      // await Promise.all(
-      //   sockets.map(
-      //     (socket) =>
-      //       new Promise<void>((resolve) => {
-      //         socket.once('close', () => {
-      //           console.log(
-      //             `Socket state: destroyed=${socket.destroyed}, readable=${socket.readable}, writable=${socket.writable}, closed=${socket.closed}`,
-      //           );
-      //           resolve();
-      //         });
-      //         socket.destroySoon();
-      //       }),
-      //   ),
-      // );
-      for (const socket of sockets) {
-        socket.destroySoon();
-      }
+      await Promise.all(
+        sockets.map(
+          (socket) =>
+            new Promise<void>((resolve) => {
+              socket.once('close', () => {
+                resolve();
+              });
+              socket.destroySoon();
+            }),
+        ),
+      );
       sockets = [];
     },
   };
