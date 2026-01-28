@@ -16,8 +16,7 @@ interface Config {
 export function useProxyForMongo(config: Config) {
   let sockets: tls.TLSSocket[] = [];
   socks.SocksClient.createConnection = async (options, callback) => {
-    options.existing_socket?.destroy();
-    const socket = await new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth }).connect({
+    const socket = await new HttpsProxySocket({ socket: options.existing_socket }, { auth: config.auth }).connect({
       host: options.destination.host,
       port: options.destination.port,
     });
