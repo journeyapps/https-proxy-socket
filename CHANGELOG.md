@@ -1,5 +1,12 @@
 # @journeyapps/https-proxy-socket
 
+## 1.0.1
+
+### Patch Changes
+
+- 0050a5d: Fixed socket timeout and use mongo driver existing socket
+- 94c3c5e: Mongo hack fix, multi socket closure
+
 ## 1.0.0
 
 ### Major Changes
