@@ -15,14 +15,14 @@ interface Config {
  */
 export function useProxyForMongo(config: Config) {
   const sockets: tls.TLSSocket[] = [];
-  const proxy: HttpsProxySocket = new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth });
   socks.SocksClient.createConnection = async (options, callback) => {
-    const socket = await proxy.connect({ host: options.destination.host, port: options.destination.port });
+    const socket = await new HttpsProxySocket(`https://${config.proxy}`, { auth: config.auth }).connect({
+      host: options.destination.host,
+      port: options.destination.port,
+    });
 
-    socket.on('error', (err) => {
-      if (err) {
-        console.error('MongoDB connection socket error:', err);
-      }
+    socket.on('timeout', () => {
+      console.error('Socket timeout');
     });
     sockets.push(socket);
     return {
@@ -38,9 +38,6 @@ export function useProxyForMongo(config: Config) {
             new Promise<void>((resolve) => {
               socket.once('close', () => {
                 count++;
-                socket.removeAllListeners();
-                socket.unref();
-                socket.destroy(new Error('Socket closed by user'));
                 resolve();
               });
               socket.end();
@@ -50,6 +47,7 @@ export function useProxyForMongo(config: Config) {
       if (count === sockets.length) {
         console.log(`Closed ${sockets.length} MongoDB connection sockets`);
       }
+      console.log(sockets);
     },
   };
 }
