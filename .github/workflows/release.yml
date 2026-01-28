@@ -45,15 +45,15 @@ jobs:
       - name: Build
         run: pnpm build
 
-      #      - name: Create Release Pull Request or Publish to npm
-      #        id: changesets
-      #        uses: changesets/action@v1
-      #        if: ${{ github.event_name == 'push' }}
-      #        with:
-      #          version: pnpm ci:version
-      #          publish: pnpm ci:publish
-      #        env:
-      #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        if: ${{ github.event_name == 'push' }}
+        with:
+          version: pnpm ci:version
+          publish: pnpm ci:publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Dev publish
         if: ${{ github.event_name == 'workflow_dispatch' }}
