@@ -36,11 +36,11 @@ export function useProxyForMongo(config: Config) {
         sockets.map(
           (socket) =>
             new Promise<void>((resolve) => {
-              socket.once('finish', () => {
+              socket.once('close', () => {
                 count++;
                 resolve();
               });
-              socket.end();
+              socket.destroySoon();
             }),
         ),
       );
