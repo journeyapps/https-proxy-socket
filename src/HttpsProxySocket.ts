@@ -87,7 +87,7 @@ export class HttpsProxySocket {
     let buffersLength = 0;
 
     function read() {
-      var b = socket.read();
+      const b = socket.read();
       if (b) {
         ondata(b);
       } else {
