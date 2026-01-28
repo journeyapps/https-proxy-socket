@@ -31,20 +31,23 @@ export function useProxyForMongo(config: Config) {
   };
   return {
     close: async () => {
-      await Promise.all(
-        sockets.map(
-          (socket) =>
-            new Promise<void>((resolve) => {
-              socket.once('close', () => {
-                console.log(
-                  `Socket state: destroyed=${socket.destroyed}, readable=${socket.readable}, writable=${socket.writable}, closed=${socket.closed}`,
-                );
-                resolve();
-              });
-              socket.destroySoon();
-            }),
-        ),
-      );
+      // await Promise.all(
+      //   sockets.map(
+      //     (socket) =>
+      //       new Promise<void>((resolve) => {
+      //         socket.once('close', () => {
+      //           console.log(
+      //             `Socket state: destroyed=${socket.destroyed}, readable=${socket.readable}, writable=${socket.writable}, closed=${socket.closed}`,
+      //           );
+      //           resolve();
+      //         });
+      //         socket.destroySoon();
+      //       }),
+      //   ),
+      // );
+      for (const socket of sockets) {
+        socket.destroySoon();
+      }
       sockets = [];
     },
   };
